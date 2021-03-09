@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "En3yLrXwVwcTttkxMH/Arl7UXBJoUEfxqawwf+Q/KtcnJwOs7B/9wmhqjPDqroOl64pOizAWN+szGbl4+s4rUA==",
+  "dgSpecHash": "FPwpjraNDh9W4LHG7BPBaAGzAEBTU7301t+mVVKbDdnWV9n4G84hjgEb9o2wtYLBvNdnWTVUpPjcoCQGDwG7pw==",
   "success": true,
-  "projectFilePath": "D:\\godot\\fpscontroller\\fpscontroller.csproj",
+  "projectFilePath": "D:\\godot\\fpsplayercontroller\\fpscontroller.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

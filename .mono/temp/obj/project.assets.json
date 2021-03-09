@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\godot\\fpscontroller\\fpscontroller.csproj",
+      "projectUniqueName": "D:\\godot\\fpsplayercontroller\\fpscontroller.csproj",
       "projectName": "fpscontroller",
-      "projectPath": "D:\\godot\\fpscontroller\\fpscontroller.csproj",
+      "projectPath": "D:\\godot\\fpsplayercontroller\\fpscontroller.csproj",
       "packagesPath": "C:\\Users\\lanxai\\.nuget\\packages\\",
-      "outputPath": "D:\\godot\\fpscontroller\\.mono\\temp\\obj\\",
+      "outputPath": "D:\\godot\\fpsplayercontroller\\.mono\\temp\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\lanxai\\AppData\\Roaming\\NuGet\\NuGet.Config",
