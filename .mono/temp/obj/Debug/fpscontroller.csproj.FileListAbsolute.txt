@@ -1,0 +1,16 @@
+D:\godot\fpscontroller\.mono\temp\bin\Debug\fpscontroller.dll
+D:\godot\fpscontroller\.mono\temp\bin\Debug\fpscontroller.pdb
+D:\godot\fpscontroller\.mono\temp\obj\Debug\fpscontroller.csprojAssemblyReference.cache
+D:\godot\fpscontroller\.mono\temp\obj\Debug\fpscontroller.AssemblyInfoInputs.cache
+D:\godot\fpscontroller\.mono\temp\obj\Debug\fpscontroller.AssemblyInfo.cs
+D:\godot\fpscontroller\.mono\temp\obj\Debug\fpscontroller.csproj.CoreCompileInputs.cache
+D:\godot\fpscontroller\.mono\temp\obj\Debug\fpscontroller.dll
+D:\godot\fpscontroller\.mono\temp\obj\Debug\fpscontroller.pdb
+D:\godot\fpsplayercontroller\.mono\temp\bin\Debug\fpscontroller.dll
+D:\godot\fpsplayercontroller\.mono\temp\bin\Debug\fpscontroller.pdb
+D:\godot\fpsplayercontroller\.mono\temp\obj\Debug\fpscontroller.csprojAssemblyReference.cache
+D:\godot\fpsplayercontroller\.mono\temp\obj\Debug\fpscontroller.AssemblyInfoInputs.cache
+D:\godot\fpsplayercontroller\.mono\temp\obj\Debug\fpscontroller.AssemblyInfo.cs
+D:\godot\fpsplayercontroller\.mono\temp\obj\Debug\fpscontroller.csproj.CoreCompileInputs.cache
+D:\godot\fpsplayercontroller\.mono\temp\obj\Debug\fpscontroller.dll
+D:\godot\fpsplayercontroller\.mono\temp\obj\Debug\fpscontroller.pdb
