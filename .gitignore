@@ -13,6 +13,7 @@ export_presets.cfg
 
 # Mono-specific ignores
 .mono/
+.vscode/
 data_*/
 
 # End of https://www.toptal.com/developers/gitignore/api/godot

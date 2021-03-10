@@ -29,6 +29,8 @@ uv1_triplanar = true
 [node name="Player" type="KinematicBody" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.22159, 2, -0.347312 )
 script = ExtResource( 1 )
+MovementSpeed = 6.0
+CrouchModeIsToggle = true
 
 [node name="Mesh" type="MeshInstance" parent="Player"]
 transform = Transform( 1, 0, 0, 0, -1.62921e-07, 1, 0, -1, -1.62921e-07, 0, -0.2, 0 )

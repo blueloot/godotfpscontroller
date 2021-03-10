@@ -5,16 +5,16 @@ public class Player : KinematicBody
 {
     // General
     [Export] private float Gravity = -42f;
-    private float HeightBodyStanding = 2.0f;
-    private float HeightHeadStanding = 1.0f;
+    private float HeightBodyStanding = 2.0f;    // collision body (including feet gives 2.5 unit tall)
+    private float HeightHeadStanding = 1.0f;    // camera Y offset locally from players origin
     private float HeightBodyCrouching = 0.5f;
     private float HeightHeadCrouching = 0.2f;
 
     // Movement
     [Export] private float MovementSpeed = 3f;
-    [Export(PropertyHint.Range,"10,20,0.1")] private float MovementStrength = 15f;
+    [Export(PropertyHint.Range,"10,20,0.1")] private float MovementStrength = 20f;
     [Export(PropertyHint.Range,"0.1,4,0.1")] private float MovementAirResistance = 3f;
-    private float MoveSpeedCrouch = 0.65f;
+    private float MoveSpeedCrouch = 0.55f;
     private float MoveSpeedSprint = 1.80f;
     private Vector3 Velocity;
     private Vector3 Direction;
