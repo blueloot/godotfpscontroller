@@ -9,11 +9,10 @@ ___
 
     [x] walking
 
-    [/] crouching
-        ! can sometimes clip through walls
+    [x] crouching
 
     [/] jumping
-        ! jumping near a slope will push player up the slope
+        ! trying to walk up a slope and jumping will push player up the slope.. :(
 
     [x] sprinting
 
