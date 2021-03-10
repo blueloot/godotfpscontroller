@@ -11,9 +11,9 @@ public class Player : KinematicBody
     private float HeightHeadCrouching = 0.2f;
 
     // Movement
-    [Export] private float MovementSpeed = 3f;
-    [Export(PropertyHint.Range,"10,20,0.1")] private float MovementStrength = 20f;
-    [Export(PropertyHint.Range,"0.1,4,0.1")] private float MovementAirResistance = 3f;
+    [Export] private float MovementSpeed = 3f;  // 3f seems like a normal walk speed for a human
+    private float MovementStrength = 20f;       // 20f makes possible to push up stairs at low move speed
+    private float MovementAirResistance = 3f;
     private float MoveSpeedCrouch = 0.55f;
     private float MoveSpeedSprint = 1.80f;
     private Vector3 Velocity;
@@ -185,13 +185,13 @@ public class Player : KinematicBody
         Mesh.Transform = mt;
 
         // reposition camera
-        var transform = Head.Transform;
-        transform.origin.y -= CrouchingSpeed * delta;
-        if (transform.origin.y < HeightHeadCrouching)
+        var ht = Head.Transform;
+        ht.origin.y -= CrouchingSpeed * delta;
+        if (ht.origin.y < HeightHeadCrouching)
         {
-            transform.origin.y = HeightHeadCrouching;
+            ht.origin.y = HeightHeadCrouching;
         }
-        Head.Transform = transform;
+        Head.Transform = ht;
     }
 
     private void CrouchTryStand(float delta)

@@ -1,9 +1,24 @@
 # First person player controller
- features:
-- walking
-- crouching
+### for a game I wanted to make in godot
 
-to do:
-- jumping
-- sprinting
-- climbing?
+#### todo / done
+
+- [x] walking
+
+- [x] crouching
+
+- [ ] jumping
+
+- [ ] sprinting
+
+- [ ] climbing?
+
+- [ ] fall damage
+
+- [ ] rigidbody interaction and damage
+
+#### examples in demo
+
+> slopes (max 50 degrees)
+
+> stairs (max 0.5 unit tal)

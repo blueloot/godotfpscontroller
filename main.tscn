@@ -85,9 +85,10 @@ transform = Transform( -0.085, -1.04723e-07, -2.49609e-07, 0, 0.383022, -0.64278
 transform = Transform( -0.085, 8.14603e-08, 2.82187e-07, 0, 0.433013, -0.5, -2.76965e-08, -0.25, -0.866025, -8.99706, 2, -10.305 )
 
 [node name="small gate" type="Spatial" parent="Level"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 15.0117, -9.53674e-07, -4.03687 )
 
 [node name="box" type="StaticBody" parent="Level/small gate"]
-transform = Transform( 1, 0, 0, 0, 2, 0, 0, 0, 1, 13, 2, -5 )
+transform = Transform( 1, 0, 0, 0, 2, 0, 0, 0, 1, 0, 2, -5 )
 
 [node name="CollisionShape" type="CollisionShape" parent="Level/small gate/box"]
 shape = SubResource( 4 )
@@ -97,7 +98,7 @@ mesh = SubResource( 5 )
 material/0 = SubResource( 6 )
 
 [node name="box2" type="StaticBody" parent="Level/small gate"]
-transform = Transform( 1, 0, 0, 0, 2, 0, 0, 0, 1, 13, 2, -1 )
+transform = Transform( 1, 0, 0, 0, 2, 0, 0, 0, 1, 0, 2, -1 )
 
 [node name="CollisionShape" type="CollisionShape" parent="Level/small gate/box2"]
 shape = SubResource( 4 )
@@ -107,7 +108,7 @@ mesh = SubResource( 5 )
 material/0 = SubResource( 6 )
 
 [node name="box4" type="StaticBody" parent="Level/small gate"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 3, -3 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -3 )
 
 [node name="CollisionShape" type="CollisionShape" parent="Level/small gate/box4"]
 shape = SubResource( 4 )
@@ -116,43 +117,11 @@ shape = SubResource( 4 )
 mesh = SubResource( 5 )
 material/0 = SubResource( 6 )
 
-[node name="small gate2" type="Spatial" parent="Level"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0 )
-
-[node name="box6" type="StaticBody" parent="Level/small gate2"]
-transform = Transform( 1, 0, 0, 0, 2, 0, 0, 0, 1, 13, 2, -5 )
-
-[node name="CollisionShape" type="CollisionShape" parent="Level/small gate2/box6"]
-shape = SubResource( 4 )
-
-[node name="MeshInstance" type="MeshInstance" parent="Level/small gate2/box6/CollisionShape"]
-mesh = SubResource( 5 )
-material/0 = SubResource( 6 )
-
-[node name="box2" type="StaticBody" parent="Level/small gate2"]
-transform = Transform( 1, 0, 0, 0, 2, 0, 0, 0, 1, 13, 2, -1 )
-
-[node name="CollisionShape" type="CollisionShape" parent="Level/small gate2/box2"]
-shape = SubResource( 4 )
-
-[node name="MeshInstance" type="MeshInstance" parent="Level/small gate2/box2/CollisionShape"]
-mesh = SubResource( 5 )
-material/0 = SubResource( 6 )
-
-[node name="box4" type="StaticBody" parent="Level/small gate2"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 3, -3 )
-
-[node name="CollisionShape" type="CollisionShape" parent="Level/small gate2/box4"]
-shape = SubResource( 4 )
-
-[node name="MeshInstance" type="MeshInstance" parent="Level/small gate2/box4/CollisionShape"]
-mesh = SubResource( 5 )
-material/0 = SubResource( 6 )
-
 [node name="jumping" type="Spatial" parent="Level"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, 10 )
 
 [node name="box5" type="StaticBody" parent="Level/jumping"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 1, -5 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -5 )
 
 [node name="CollisionShape" type="CollisionShape" parent="Level/jumping/box5"]
 shape = SubResource( 4 )
@@ -162,7 +131,7 @@ mesh = SubResource( 5 )
 material/0 = SubResource( 6 )
 
 [node name="box8" type="StaticBody" parent="Level/jumping"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 1, -9 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -9 )
 
 [node name="CollisionShape" type="CollisionShape" parent="Level/jumping/box8"]
 shape = SubResource( 4 )
@@ -172,7 +141,7 @@ mesh = SubResource( 5 )
 material/0 = SubResource( 6 )
 
 [node name="box9" type="StaticBody" parent="Level/jumping"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 3, -9 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -9 )
 
 [node name="CollisionShape" type="CollisionShape" parent="Level/jumping/box9"]
 shape = SubResource( 4 )
@@ -182,7 +151,7 @@ mesh = SubResource( 5 )
 material/0 = SubResource( 6 )
 
 [node name="box6" type="StaticBody" parent="Level/jumping"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 0, -1 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1 )
 
 [node name="CollisionShape" type="CollisionShape" parent="Level/jumping/box6"]
 shape = SubResource( 4 )
@@ -191,13 +160,86 @@ shape = SubResource( 4 )
 mesh = SubResource( 5 )
 material/0 = SubResource( 6 )
 
-[node name="box7" type="StaticBody" parent="Level/jumping"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -11, -0.5, 3 )
+[node name="stairs" type="Spatial" parent="Level"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, -3 )
 
-[node name="CollisionShape" type="CollisionShape" parent="Level/jumping/box7"]
+[node name="box7" type="StaticBody" parent="Level/stairs"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 3 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Level/stairs/box7"]
 shape = SubResource( 4 )
 
-[node name="MeshInstance" type="MeshInstance" parent="Level/jumping/box7/CollisionShape"]
+[node name="MeshInstance" type="MeshInstance" parent="Level/stairs/box7/CollisionShape"]
+mesh = SubResource( 5 )
+material/0 = SubResource( 6 )
+
+[node name="box6" type="StaticBody" parent="Level/stairs"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Level/stairs/box6"]
+shape = SubResource( 4 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Level/stairs/box6/CollisionShape"]
+mesh = SubResource( 5 )
+material/0 = SubResource( 6 )
+
+[node name="box5" type="StaticBody" parent="Level/stairs"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 1 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Level/stairs/box5"]
+shape = SubResource( 4 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Level/stairs/box5/CollisionShape"]
+mesh = SubResource( 5 )
+material/0 = SubResource( 6 )
+
+[node name="box8" type="StaticBody" parent="Level/stairs"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Level/stairs/box8"]
+shape = SubResource( 4 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Level/stairs/box8/CollisionShape"]
+mesh = SubResource( 5 )
+material/0 = SubResource( 6 )
+
+[node name="box9" type="StaticBody" parent="Level/stairs"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -1 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Level/stairs/box9"]
+shape = SubResource( 4 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Level/stairs/box9/CollisionShape"]
+mesh = SubResource( 5 )
+material/0 = SubResource( 6 )
+
+[node name="box10" type="StaticBody" parent="Level/stairs"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -2 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Level/stairs/box10"]
+shape = SubResource( 4 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Level/stairs/box10/CollisionShape"]
+mesh = SubResource( 5 )
+material/0 = SubResource( 6 )
+
+[node name="box11" type="StaticBody" parent="Level/stairs"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -3 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Level/stairs/box11"]
+shape = SubResource( 4 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Level/stairs/box11/CollisionShape"]
+mesh = SubResource( 5 )
+material/0 = SubResource( 6 )
+
+[node name="box12" type="StaticBody" parent="Level/stairs"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -4 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Level/stairs/box12"]
+shape = SubResource( 4 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Level/stairs/box12/CollisionShape"]
 mesh = SubResource( 5 )
 material/0 = SubResource( 6 )
 
