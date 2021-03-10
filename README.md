@@ -1,13 +1,19 @@
 # First person player controller
-### for a game I wanted to make in godot
 
-#### todo / done
+    fps controller for a game I want to make in godot
+
+    work in progress
+___
+
+    to do list
 
     [x] walking
 
-    [x] crouching
+    [/] crouching
+        ! can sometimes clip through walls
 
-    [x] jumping
+    [/] jumping
+        ! jumping near a slope will push player up the slope
 
     [x] sprinting
 
@@ -19,15 +25,5 @@
 
     [ ] camera bobbing
 
-    [ ] slide when crouching after sprint
+    [ ] slide if sprint + crouch
 
-#### showcased in this demo, and some notes
-
-    slopes
-        - default: above 50 degrees slope is considered "not floor"
-        - change player shape in editor to adjust this threshold
-
-    stairs
-        - default: 0.5 units tall obstacle is considered "stair"
-        - change player shape in editor to adjust maximum step size
-        - note: might change in the future to support rigidbodies

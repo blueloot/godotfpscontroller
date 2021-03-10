@@ -7,13 +7,13 @@ public class Player : KinematicBody
     private float HeightBodyStanding = 2.0f;    // collision body (including feet gives 2.5 unit tall)
     private float HeightHeadStanding = 1.0f;    // camera Y offset locally from players origin
     private float HeightBodyCrouching = 0.5f;
-    private float HeightHeadCrouching = 0.2f;
+    private float HeightHeadCrouching = 0.1f;
 
     // Movement
     [Export] private float MovementSpeed = 3f;  // 3f seems like a normal walk speed for a human
     private float MovementStrength = 20f;       // (0.4f of this when sprinting)
     private float MoveSpeedCrouch = 0.55f;
-    private float MoveSpeedSprint = 2.60f;
+    private float MoveSpeedSprint = 4f; //2.60f;
     [Export] private bool CrouchModeIsToggle = false;
     [Export(PropertyHint.Range,"2,20,0.5")] private float CrouchingSpeed = 6f;
     private bool SprintRequest;
@@ -21,6 +21,9 @@ public class Player : KinematicBody
     private bool oldCrouchRequest;
     private Vector3 Velocity;
     private Vector3 Direction;
+
+    // Sliding
+    private bool SlideRequest;
 
     // Rotation
     [Export] private float RotationSensitivity = 0.05f;
@@ -75,8 +78,6 @@ public class Player : KinematicBody
         CrouchGetToggle();
         CrouchProcess(delta);
         SprintProcess();
-
-        RotationClampCamera();
     }
 
 
@@ -85,8 +86,8 @@ public class Player : KinematicBody
 
     private void SprintProcess()
     {
-        // reset and exit if airborne or crouching
-        if ((!Floored()) || (CrouchRequest))
+        // reset and exit if crouching
+        if (CrouchRequest)
         {
             SprintRequest = false;
             return;
@@ -119,10 +120,12 @@ public class Player : KinematicBody
         // exit if crouched and not allowed to stand
         if (CrouchRequest && HeadBonker.IsColliding()) { return; }
 
-        // apply jumpforce (weakened when crouched)
+        // apply jumpforce (weakened when crouched or sprinting)
         if (JumpGetInput())
         {
-            Velocity.y += (CrouchRequest) ? JumpPower / 1.5f : JumpPower;
+            Velocity.y += (CrouchRequest || SprintRequest)
+                ? JumpPower / (SprintRequest ? 1.2f : 1.5f)
+                : JumpPower;
             JumpRequest = true;
         }
     }
@@ -150,10 +153,20 @@ public class Player : KinematicBody
 
 
     // Crouching
+
     private void CrouchSetState(bool state)
     {
         CrouchRequest = state;
         oldCrouchRequest = CrouchRequest;
+
+        // slide?
+        if (CrouchRequest && SprintRequest)
+        {
+            if (SlideAllowed())
+            {
+                SlideInitiate();
+            }
+        }
     }
 
     private void CrouchGetToggle()
@@ -296,6 +309,20 @@ public class Player : KinematicBody
     }
 
 
+
+    // Sliding
+
+    private bool SlideAllowed()
+    {
+        return false;
+    }
+    private void SlideInitiate()
+    {
+        return;
+    }
+
+
+
     // Movement
 
     private void MovementProcess(float delta)
@@ -358,9 +385,11 @@ public class Player : KinematicBody
     {
         if (@event is InputEventMouseMotion && MouseHidden())
         {
-            var movement = @event as InputEventMouseMotion;
-            RotateY(Mathf.Deg2Rad(-movement.Relative.x * RotationSensitivity));
-            Head.RotateX(Mathf.Deg2Rad(movement.Relative.y * RotationSensitivity * MouseModeAxisX));
+            var mousemotion = @event as InputEventMouseMotion;
+            RotateY(Mathf.Deg2Rad(-mousemotion.Relative.x * RotationSensitivity));
+            Head.RotateX(Mathf.Deg2Rad(mousemotion.Relative.y * RotationSensitivity * MouseModeAxisX));
+
+            RotationClampCamera();
         }
     }
 
