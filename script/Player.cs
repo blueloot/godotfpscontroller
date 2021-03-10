@@ -3,45 +3,46 @@ using System;
 
 public class Player : KinematicBody
 {
-    // General
-    private float HeightBodyStanding = 2.0f;    // collision body (including feet gives 2.5 unit tall)
-    private float HeightHeadStanding = 1.0f;    // camera Y offset locally from players origin
-    private float HeightBodyCrouching = 0.5f;
-    private float HeightHeadCrouching = 0.1f;
-
-    // Movement
+    // Exports
+    [Export] private float Gravity = -42f;
+    [Export] private float JumpPower = 22f;     // SprintRequest multiplies this by 0.8f and CrouchRequest by 0.6f;
     [Export] private float MovementSpeed = 3f;  // 3f seems like a normal walk speed for a human
-    private float MovementStrength = 20f;       // (0.4f of this when sprinting)
-    private float MoveSpeedCrouch = 0.55f;
-    private float MoveSpeedSprint = 4f; //2.60f;
     [Export] private bool CrouchModeIsToggle = false;
-    [Export(PropertyHint.Range,"2,20,0.5")] private float CrouchingSpeed = 6f;
-    private bool SprintRequest;
-    private bool CrouchRequest;
-    private bool oldCrouchRequest;
-    private Vector3 Velocity;
-    private Vector3 Direction;
-
-    // Sliding
-    private bool SlideRequest;
-
-    // Rotation
     [Export] private float RotationSensitivity = 0.05f;
     [Export] private bool RotationReverseX = false;
     [Export] private float RotationMaxPitch = 70f;
-    private int MouseModeAxisX { get { return (RotationReverseX)?1:-1; } }
 
-    // Jumping
-    [Export] private float Gravity = -42f;
-    [Export] private float JumpPower = 22f;
-    private bool JumpRequest = false;
+    // Movement
+    private float MovementStrength = 20f;   // gives best result. SprintRequest multiplies this by 0.4f
+    private float MoveSpeedCrouch = 0.55f;  // MovementSpeed is multiplied by this value
+    private float MoveSpeedSprint = 2.60f;  // MovementSpeed is multiplied by this value. 4f feels natural.
+    private float CrouchTransitionSpeed = 6f;   // between 2f and 20f otherwise it looks like it will glitch
+    private Vector3 Velocity;
+    private Vector3 Direction;
+
+    // Player height for crouching and standing. must match player scene for best result
+    private float HeightBodyStanding = 2.0f;    // feet are 0.5 units, so this gives us 2.5f height total
+    private float HeightHeadStanding = 1.0f;
+    private float HeightBodyCrouching = 0.5f;
+    private float HeightHeadCrouching = 0.1f;
+
+    // Requests
+    private bool JumpRequest;
+    private bool SlideRequest;
+    private bool SprintRequest;
+    private bool CrouchRequest;
+    private bool oldCrouchRequest;
+
+    // Other
+    private int MouseModeAxisX() { return (RotationReverseX)?1:-1; }
 
     // Nodes
     private CollisionShape Body;
     private MeshInstance Mesh;
     private Spatial Head;
-    private RayCast HeadBonker;
+    private Area HeadBonker;
     private Area JumpHelper;
+    private Mouse Mouse;
 
 
 
@@ -51,10 +52,12 @@ public class Player : KinematicBody
         Body = GetNode<CollisionShape>("Body");
         Mesh = GetNode<MeshInstance>("Mesh");
         Head = GetNode<Spatial>("Head");
-        HeadBonker = GetNode<RayCast>("HeadBonker");
+        HeadBonker = GetNode<Area>("HeadBonker");
         JumpHelper = GetNode<Area>("JumpHelper");
 
-        MouseHide();
+        Mouse = GetNode<Mouse>("/root/Mouse");
+
+        Mouse.Hide();
         CrouchSetState(false);
     }
 
@@ -71,7 +74,7 @@ public class Player : KinematicBody
     // Godot : PHYSICS
     public override void _PhysicsProcess(float delta)
     {
-        MouseHideShow();
+        Mouse.HideShow();
 
         MovementProcess(delta);
         JumpProcess();
@@ -118,7 +121,7 @@ public class Player : KinematicBody
         if (JumpHelper.GetOverlappingBodies().Count == 1){ return; }
 
         // exit if crouched and not allowed to stand
-        if (CrouchRequest && HeadBonker.IsColliding()) { return; }
+        if (CrouchRequest && HeadBonker.GetOverlappingBodies().Count != 1) { return; }
 
         // apply jumpforce (weakened when crouched or sprinting)
         if (JumpGetInput())
@@ -226,7 +229,7 @@ public class Player : KinematicBody
     private void CrouchWatchYourHead()
     {
         var body = Body.Shape as CylinderShape;
-        if (body.Height < HeightBodyStanding && HeadBonker.IsColliding())
+        if (body.Height < HeightBodyStanding && HeadBonker.GetOverlappingBodies().Count != 1)
         {
             CrouchSetState(true);
         }
@@ -239,34 +242,15 @@ public class Player : KinematicBody
         // skip if already max crouch
         if (body.Height == HeightBodyCrouching) { return; }
 
-        // resize collider
-        body.Height -= CrouchingSpeed * delta;
-        if (body.Height < HeightBodyCrouching)
-        {
-            body.Height = HeightBodyCrouching;
-        }
-
-        // reposition collider
-        var bt = Body.Transform;
-        bt.origin.y = 0 - (1-(body.Height / HeightBodyStanding));
-        Body.Transform = bt;
-
-        // resize mesh
-        var mesh = Mesh.Mesh as CapsuleMesh;
-        mesh.MidHeight = body.Height - 0.5f;
-
-        // reposition mesh
-        var mt = Mesh.Transform;
-        mt.origin.y = -0.2f - (1-((body.Height-0.5f) / (HeightBodyStanding-0.5f)));
-        Mesh.Transform = mt;
+        // update collider and mesh
+        body.Height = (body.Height < HeightBodyCrouching) ? HeightBodyCrouching : body.Height - CrouchTransitionSpeed * delta;
+        CrouchUpdateCollider(body);
+        CrouchUpdateMesh(body);
 
         // reposition camera
         var ht = Head.Transform;
-        ht.origin.y -= CrouchingSpeed * delta;
-        if (ht.origin.y < HeightHeadCrouching)
-        {
-            ht.origin.y = HeightHeadCrouching;
-        }
+        ht.origin.y -= CrouchTransitionSpeed * delta;
+        ht.origin.y = (ht.origin.y < HeightHeadCrouching) ? HeightHeadCrouching : ht.origin.y;
         Head.Transform = ht;
     }
 
@@ -277,35 +261,34 @@ public class Player : KinematicBody
         // skip if already max stand
         if (body.Height == HeightBodyStanding) { return; }
 
-        // resize collider
-        body.Height += CrouchingSpeed * delta;
-        if (body.Height > HeightBodyStanding)
-        {
-            body.Height = HeightBodyStanding;
-        }
-
-        // reposition collider
-        var bt = Body.Transform;
-        bt.origin.y = 0 - (1-(body.Height / HeightBodyStanding));
-        Body.Transform = bt;
-
-        // resize mesh
-        var mesh = Mesh.Mesh as CapsuleMesh;
-        mesh.MidHeight = body.Height - 0.5f;
-
-        // reposition mesh
-        var mt = Mesh.Transform;
-        mt.origin.y = -0.2f - (1-((body.Height-0.5f) / (HeightBodyStanding-0.5f)));
-        Mesh.Transform = mt;
+        // update collider and mesh
+        body.Height = (body.Height > HeightBodyStanding) ? HeightBodyStanding : body.Height + CrouchTransitionSpeed * delta;
+        CrouchUpdateCollider(body);
+        CrouchUpdateMesh(body);
 
         // reposition camera
         var ht = Head.Transform;
-        ht.origin.y += CrouchingSpeed * delta;
-        if (ht.origin.y > HeightHeadStanding)
-        {
-            ht.origin.y = HeightHeadStanding;
-        }
+        ht.origin.y += CrouchTransitionSpeed * delta;
+        ht.origin.y = (ht.origin.y > HeightHeadStanding) ? HeightHeadStanding : ht.origin.y;
         Head.Transform = ht;
+    }
+
+    private void CrouchUpdateMesh(CylinderShape body)
+    {
+        var meshSizeOffset = 0.5f;      // mesh is 0.5f shorter than collider
+        var meshPositionOffset = -0.2f; // mesh is positioned -0.2f below collider
+        var mesh = Mesh.Mesh as CapsuleMesh;
+        var mt = Mesh.Transform;
+        mesh.MidHeight = body.Height - meshSizeOffset;
+        mt.origin.y = meshPositionOffset - (1-((body.Height-meshSizeOffset) / (HeightBodyStanding-meshSizeOffset)));
+        Mesh.Transform = mt;
+    }
+
+    private void CrouchUpdateCollider(CylinderShape body)
+    {
+        var bt = Body.Transform;
+        bt.origin.y = 0 - (1-(body.Height / HeightBodyStanding));
+        Body.Transform = bt;
     }
 
 
@@ -383,11 +366,11 @@ public class Player : KinematicBody
 
     private void InputSetRotation(InputEvent @event)
     {
-        if (@event is InputEventMouseMotion && MouseHidden())
+        if (@event is InputEventMouseMotion && Mouse.Hidden())
         {
             var mousemotion = @event as InputEventMouseMotion;
             RotateY(Mathf.Deg2Rad(-mousemotion.Relative.x * RotationSensitivity));
-            Head.RotateX(Mathf.Deg2Rad(mousemotion.Relative.y * RotationSensitivity * MouseModeAxisX));
+            Head.RotateX(Mathf.Deg2Rad(mousemotion.Relative.y * RotationSensitivity * MouseModeAxisX()));
 
             RotationClampCamera();
         }
@@ -395,43 +378,7 @@ public class Player : KinematicBody
 
     private bool InputAllowed()
     {
-        return MouseHidden();
+        return Mouse.Hidden();
     }
 
-
-
-    // Mouse
-
-    private void MouseHideShow()
-    {
-        if (!Input.IsActionJustPressed("ui_cancel")) { return; }
-
-        if (MouseVisible())
-        {
-            MouseHide();
-            return;
-        }
-
-        MouseShow();
-    }
-
-    private void MouseHide()
-    {
-        Input.SetMouseMode(Input.MouseMode.Captured);
-    }
-
-    private void MouseShow()
-    {
-        Input.SetMouseMode(Input.MouseMode.Visible);
-    }
-
-    private bool MouseVisible()
-    {
-        return Input.GetMouseMode() == Input.MouseMode.Visible;
-    }
-
-    private bool MouseHidden()
-    {
-        return Input.GetMouseMode() == Input.MouseMode.Captured;
-    }
 }
