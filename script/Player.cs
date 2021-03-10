@@ -4,7 +4,6 @@ using System;
 public class Player : KinematicBody
 {
     // General
-    [Export] private float Gravity = -42f;
     private float HeightBodyStanding = 2.0f;    // collision body (including feet gives 2.5 unit tall)
     private float HeightHeadStanding = 1.0f;    // camera Y offset locally from players origin
     private float HeightBodyCrouching = 0.5f;
@@ -31,11 +30,17 @@ public class Player : KinematicBody
     private bool CrouchRequest;
     private bool oldCrouchRequest;
 
+    // Jumping
+    [Export] private float Gravity = -42f;
+    [Export] private float JumpPower = 22f;
+    private bool JumpRequest = false;
+
     // Nodes
     private CollisionShape Body;
     private MeshInstance Mesh;
     private Spatial Head;
     private RayCast HeadBonker;
+    private Area JumpHelper;
 
 
 
@@ -46,6 +51,7 @@ public class Player : KinematicBody
         Mesh = GetNode<MeshInstance>("Mesh");
         Head = GetNode<Spatial>("Head");
         HeadBonker = GetNode<RayCast>("HeadBonker");
+        JumpHelper = GetNode<Area>("JumpHelper");
 
         MouseHide();
         CrouchSetState(false);
@@ -67,10 +73,46 @@ public class Player : KinematicBody
         MouseHideShow();
 
         MovementProcess(delta);
+        JumpProcess(delta);
         CrouchGetToggle();
         CrouchProcess(delta);
 
         RotationClampCamera();
+    }
+
+
+
+    // Jumping
+
+    private void JumpProcess(float delta)
+    {
+        // remove request
+        JumpRequest = false;
+
+        // exit if JumpHelper only collides with 1 body (player) because it means player is airborne
+        if (JumpHelper.GetOverlappingBodies().Count == 1){ return; }
+
+        // exit if crouched and not allowed to stand
+        if (CrouchRequest && HeadBonker.IsColliding()) { return; }
+
+        // apply jumpforce (weakened when crouched)
+        if (JumpGetInput())
+        {
+            Velocity.y += (CrouchRequest) ? JumpPower / 1.5f : JumpPower;
+            JumpRequest = true;
+        }
+    }
+
+    private bool JumpGetInput()
+    {
+        if (InputAllowed())
+        {
+            if (Input.IsActionJustPressed("jump"))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -252,7 +294,7 @@ public class Player : KinematicBody
         Velocity.y += Gravity * delta;
 
         // apply collision
-        MoveAndSlideWithSnap(Velocity, Vector3.Down, Vector3.Up, false, 4, 0.785398f, false);
+        MoveAndSlide(Velocity, Vector3.Up, false, 4, 0.785398f, false);
     }
 
     private void MovementGetDirection()

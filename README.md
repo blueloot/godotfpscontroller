@@ -3,22 +3,29 @@
 
 #### todo / done
 
-- [x] walking
+    [x] walking
 
-- [x] crouching
+    [x] crouching
 
-- [ ] jumping
+    [x] jumping
 
-- [ ] sprinting
+    [ ] sprinting
 
-- [ ] climbing?
+    [ ] climbing?
 
-- [ ] fall damage
+    [ ] fall damage
 
-- [ ] rigidbody interaction and damage
+    [ ] rigidbody interaction and damage
 
-#### examples in demo
+    [ ] camera bobbing
 
-> slopes (max 50 degrees)
+#### showcased in this demo, and some notes
 
-> stairs (max 0.5 unit tal)
+    slopes
+        - default: above 50 degrees slope is considered "not floor"
+        - change player shape in editor to adjust this threshold
+
+    stairs
+        - default: 0.5 units tall obstacle is considered "stair"
+        - change player shape in editor to adjust maximum step size
+        - note: might change in the future to support rigidbodies

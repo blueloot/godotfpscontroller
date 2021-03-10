@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://script/Player.cs" type="Script" id=1]
 [ext_resource path="res://prefab/Floor.tscn" type="PackedScene" id=2]
@@ -13,6 +13,10 @@ mid_height = 1.5
 radius = 0.5
 
 [sub_resource type="RayShape" id=3]
+
+[sub_resource type="CylinderShape" id=7]
+radius = 0.48
+height = 0.6
 
 [sub_resource type="BoxShape" id=4]
 
@@ -29,8 +33,6 @@ uv1_triplanar = true
 [node name="Player" type="KinematicBody" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.22159, 2, -0.347312 )
 script = ExtResource( 1 )
-MovementSpeed = 6.0
-CrouchModeIsToggle = true
 
 [node name="Mesh" type="MeshInstance" parent="Player"]
 transform = Transform( 1, 0, 0, 0, -1.62921e-07, 1, 0, -1, -1.62921e-07, 0, -0.2, 0 )
@@ -54,6 +56,18 @@ shape = SubResource( 3 )
 [node name="HeadBonker" type="RayCast" parent="Player"]
 enabled = true
 cast_to = Vector3( 0, 1.05, 0 )
+__meta__ = {
+"_editor_description_": "raycast to check if there is a ceiling above player when it tries to stand after crouching"
+}
+
+[node name="JumpHelper" type="Area" parent="Player"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.2, 0 )
+__meta__ = {
+"_editor_description_": "helper so that player can jump under certain circumstances"
+}
+
+[node name="JumpHelperShape" type="CollisionShape" parent="Player/JumpHelper"]
+shape = SubResource( 7 )
 
 [node name="Level" type="Node" parent="."]
 
