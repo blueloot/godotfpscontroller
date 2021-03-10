@@ -7,7 +7,7 @@
 
     [x] crouching
 
-    [ ] jumping
+    [x] jumping
 
     [ ] sprinting
 
