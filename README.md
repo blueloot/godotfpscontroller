@@ -9,7 +9,7 @@
 
     [x] jumping
 
-    [ ] sprinting
+    [x] sprinting
 
     [ ] climbing?
 
@@ -18,6 +18,8 @@
     [ ] rigidbody interaction and damage
 
     [ ] camera bobbing
+
+    [ ] slide when crouching after sprint
 
 #### showcased in this demo, and some notes
 

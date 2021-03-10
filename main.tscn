@@ -15,7 +15,7 @@ radius = 0.5
 [sub_resource type="RayShape" id=3]
 
 [sub_resource type="CylinderShape" id=7]
-radius = 0.48
+radius = 0.4
 height = 0.6
 
 [sub_resource type="BoxShape" id=4]
@@ -33,6 +33,7 @@ uv1_triplanar = true
 [node name="Player" type="KinematicBody" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.22159, 2, -0.347312 )
 script = ExtResource( 1 )
+CrouchModeIsToggle = true
 
 [node name="Mesh" type="MeshInstance" parent="Player"]
 transform = Transform( 1, 0, 0, 0, -1.62921e-07, 1, 0, -1, -1.62921e-07, 0, -0.2, 0 )

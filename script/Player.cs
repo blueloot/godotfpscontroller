@@ -11,10 +11,14 @@ public class Player : KinematicBody
 
     // Movement
     [Export] private float MovementSpeed = 3f;  // 3f seems like a normal walk speed for a human
-    private float MovementStrength = 20f;       // 20f makes possible to push up stairs at low move speed
-    private float MovementAirResistance = 3f;
+    private float MovementStrength = 20f;       // (0.4f of this when sprinting)
     private float MoveSpeedCrouch = 0.55f;
-    private float MoveSpeedSprint = 1.80f;
+    private float MoveSpeedSprint = 2.60f;
+    [Export] private bool CrouchModeIsToggle = false;
+    [Export(PropertyHint.Range,"2,20,0.5")] private float CrouchingSpeed = 6f;
+    private bool SprintRequest;
+    private bool CrouchRequest;
+    private bool oldCrouchRequest;
     private Vector3 Velocity;
     private Vector3 Direction;
 
@@ -23,12 +27,6 @@ public class Player : KinematicBody
     [Export] private bool RotationReverseX = false;
     [Export] private float RotationMaxPitch = 70f;
     private int MouseModeAxisX { get { return (RotationReverseX)?1:-1; } }
-
-    // Crouching
-    [Export] private bool CrouchModeIsToggle = false;
-    [Export(PropertyHint.Range,"2,20,0.5")] private float CrouchingSpeed = 10f;
-    private bool CrouchRequest;
-    private bool oldCrouchRequest;
 
     // Jumping
     [Export] private float Gravity = -42f;
@@ -73,18 +71,44 @@ public class Player : KinematicBody
         MouseHideShow();
 
         MovementProcess(delta);
-        JumpProcess(delta);
+        JumpProcess();
         CrouchGetToggle();
         CrouchProcess(delta);
+        SprintProcess();
 
         RotationClampCamera();
     }
 
 
 
+    // Sprinting
+
+    private void SprintProcess()
+    {
+        // reset and exit if airborne or crouching
+        if ((!Floored()) || (CrouchRequest))
+        {
+            SprintRequest = false;
+            return;
+        }
+
+        SprintRequest = SprintGetInput();
+    }
+
+    private bool SprintGetInput()
+    {
+        if (InputAllowed())
+        {
+            return (Input.IsActionPressed("sprint"));
+        }
+        return false;
+    }
+
+
+
     // Jumping
 
-    private void JumpProcess(float delta)
+    private void JumpProcess()
     {
         // remove request
         JumpRequest = false;
@@ -107,10 +131,7 @@ public class Player : KinematicBody
     {
         if (InputAllowed())
         {
-            if (Input.IsActionJustPressed("jump"))
-            {
-                return true;
-            }
+            return Input.IsActionJustPressed("jump");
         }
         return false;
     }
@@ -284,24 +305,30 @@ public class Player : KinematicBody
         // get target velocity
         var speedMultiplier = 1.0f;
             speedMultiplier = (CrouchRequest) ? MoveSpeedCrouch : speedMultiplier;
-        var targetVel = Direction * (MovementSpeed * speedMultiplier);
-
-        // set acceleration
-        var acceleration = (IsOnFloor()) ? MovementStrength : MovementAirResistance;
+            speedMultiplier = (SprintRequest) ? MoveSpeedSprint : speedMultiplier;
+        var targetVel = Direction * ((MovementSpeed * (JumpRequest?3:1)) * speedMultiplier);
 
         // set velocity
-        Velocity = Velocity.LinearInterpolate( targetVel, acceleration * delta);
+        if (Floored())
+        {
+            Velocity = Velocity.LinearInterpolate( targetVel, (MovementStrength * (SprintRequest?0.4f:1f)) * delta);
+        }
         Velocity.y += Gravity * delta;
 
         // apply collision
         MoveAndSlide(Velocity, Vector3.Up, false, 4, 0.785398f, false);
     }
 
+    private bool Floored()
+    {
+        return (IsOnFloor() || (JumpHelper.GetOverlappingBodies().Count != 1));
+    }
+
     private void MovementGetDirection()
     {
         var movement = MovementGetInputVector();
         var transform = GlobalTransform;
-        Direction = (IsOnFloor()) ? Vector3.Zero : Direction;
+        Direction = (Floored()) ? Vector3.Zero : Direction;
         Direction += -transform.basis.z * movement.y;
         Direction +=  transform.basis.x * movement.x;
         Direction = Direction.Normalized();
