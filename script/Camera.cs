@@ -5,7 +5,7 @@ public class Camera : Godot.Camera
 {
 
     [Export] private NodePath Player;
-    [Export] private float FollowDelay = 10.0f;
+    [Export] private float FollowDelay = 15.0f;
 
     [Export] private float RotationSensitivity = 0.05f;
     [Export] private bool RotationReverseX = false;

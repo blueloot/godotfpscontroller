@@ -16,6 +16,8 @@ public class Player : KinematicBody
     private float CrouchTransitionSpeed = 6f;   // between 2f and 20f otherwise it looks like it will glitch
     private Vector3 Velocity;
     private Vector3 Direction;
+    private float SlideSpeed;
+    private float SlideRest;
 
     // Player height for crouching and standing. must match player scene for best result
     private float HeightBodyStanding = 2.0f;    // feet are 0.5 units, so this gives us 2.5f height total
@@ -67,6 +69,9 @@ public class Player : KinematicBody
         CrouchGetToggle();
         CrouchProcess(delta);
         SprintProcess();
+        SlideProcess(delta);
+
+        GD.Print($"Slide: {SlideRest}");
     }
 
 
@@ -116,6 +121,7 @@ public class Player : KinematicBody
                 ? JumpPower / (SprintRequest ? 1.2f : 1.5f)
                 : JumpPower;
             JumpRequest = true;
+            SlideStop();
         }
     }
 
@@ -143,7 +149,14 @@ public class Player : KinematicBody
             if (SlideAllowed())
             {
                 SlideInitiate();
+                return;
             }
+        }
+
+        // stop slide?
+        if (!CrouchRequest)
+        {
+            SlideStop();
         }
     }
 
@@ -272,11 +285,40 @@ public class Player : KinematicBody
 
     private bool SlideAllowed()
     {
+        if (SlideRest <= 0f)
+        {
+            return true;
+        }
         return false;
     }
     private void SlideInitiate()
     {
+        SlideSpeed = MovementSpeed * MoveSpeedSprint;
+        SlideRequest = true;
+        SlideRest = 1f;
         return;
+    }
+    private void SlideStop()
+    {
+        SlideRequest = false;
+        return;
+    }
+    private void SlideProcess(float delta)
+    {
+        if (SlideRequest)
+        {
+            SlideSpeed -= MovementStrength * delta;
+
+            if (SlideSpeed <= 0f)
+            {
+                SlideStop();
+            }
+        }
+
+        if (SlideRest > 0)
+        {
+            SlideRest -= 2f * delta;
+        }
     }
 
 
@@ -291,6 +333,7 @@ public class Player : KinematicBody
         var speedMultiplier = 1.0f;
             speedMultiplier = (CrouchRequest) ? MoveSpeedCrouch : speedMultiplier;
             speedMultiplier = (SprintRequest) ? MoveSpeedSprint : speedMultiplier;
+            speedMultiplier = (SlideRequest)  ? SlideSpeed : speedMultiplier;
         var targetVel = Direction * ((MovementSpeed * (JumpRequest?3:1)) * speedMultiplier);
 
         // set velocity
@@ -313,7 +356,7 @@ public class Player : KinematicBody
     {
         var movement = MovementGetInputVector();
         var transform = GlobalTransform;
-        Direction = (Floored()) ? Vector3.Zero : Direction;
+        Direction = (Floored() && !SlideRequest) ? Vector3.Zero : Direction;
         Direction += -transform.basis.z * movement.y;
         Direction +=  transform.basis.x * movement.x;
         Direction = Direction.Normalized();
@@ -321,7 +364,7 @@ public class Player : KinematicBody
 
     private Vector2 MovementGetInputVector()
     {
-        if (InputAllowed())
+        if (InputAllowed() && !SlideRequest)
         {
             if (Input.IsActionPressed("forward") || Input.IsActionPressed("left")
             || Input.IsActionPressed("backward") || Input.IsActionPressed("right"))

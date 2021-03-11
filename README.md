@@ -24,5 +24,5 @@ ___
 
     [ ] camera bobbing
 
-    [ ] slide if sprint + crouch
+    [x] slide if sprint + crouch
 
