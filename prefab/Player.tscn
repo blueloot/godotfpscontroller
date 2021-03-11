@@ -31,8 +31,6 @@ material/0 = null
 [node name="Head" type="Spatial" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0 )
 
-[node name="notinuse" type="Camera" parent="Head"]
-
 [node name="Body" type="CollisionShape" parent="."]
 shape = SubResource( 2 )
 

@@ -4,7 +4,7 @@
 [ext_resource path="res://prefab/Floor.tscn" type="PackedScene" id=2]
 [ext_resource path="res://prefab/Wall.tscn" type="PackedScene" id=3]
 [ext_resource path="res://grid01.png" type="Texture" id=4]
-[ext_resource path="res://script/Camera.cs" type="Script" id=5]
+[ext_resource path="res://prefab/PlayerCamera.tscn" type="PackedScene" id=5]
 
 [sub_resource type="BoxShape" id=1]
 
@@ -29,14 +29,6 @@ uv1_scale = Vector3( 0.5, 0.5, 0.5 )
 uv1_triplanar = true
 
 [node name="Main" type="Spatial"]
-
-[node name="Player" parent="." instance=ExtResource( 1 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0 )
-
-[node name="PlayerCamera" type="Camera" parent="."]
-current = true
-script = ExtResource( 5 )
-Player = NodePath("../Player")
 
 [node name="Level" type="Node" parent="."]
 
@@ -258,6 +250,14 @@ shape = SubResource( 1 )
 [node name="MeshInstance" type="MeshInstance" parent="Level/stairs/box12/CollisionShape"]
 mesh = SubResource( 2 )
 material/0 = SubResource( 3 )
+
+[node name="player" type="Spatial" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0 )
+
+[node name="Body" parent="player" instance=ExtResource( 1 )]
+
+[node name="Eyes" parent="player" instance=ExtResource( 5 )]
+Player = NodePath("../Body")
 
 [node name="OmniLight" type="OmniLight" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0 )

@@ -22,7 +22,7 @@ public class Player : KinematicBody
     // Player height for crouching and standing. must match player scene for best result
     private float HeightBodyStanding = 2.0f;    // feet are 0.5 units, so this gives us 2.5f height total
     private float HeightHeadStanding = 1.0f;
-    private float HeightBodyCrouching = 0.5f;
+    private float HeightBodyCrouching = 1.2f;
     private float HeightHeadCrouching = 0.1f;
 
     // Requests
@@ -70,8 +70,6 @@ public class Player : KinematicBody
         CrouchProcess(delta);
         SprintProcess();
         SlideProcess(delta);
-
-        GD.Print($"Slide: {SlideRest}");
     }
 
 
@@ -113,6 +111,11 @@ public class Player : KinematicBody
 
         // exit if crouched and not allowed to stand
         if (CrouchRequest && HeadBonker.GetOverlappingBodies().Count != 1) { return; }
+
+        // TODO :   to prevent climbing up slopes
+        //          exit if floor normal is abnormal, 
+        //          or change jump direction to match floor normal
+        if (1==0) { }
 
         // apply jumpforce (weakened when crouched or sprinting)
         if (JumpGetInput())
