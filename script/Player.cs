@@ -8,9 +8,6 @@ public class Player : KinematicBody
     [Export] private float JumpPower = 22f;     // SprintRequest multiplies this by 0.8f and CrouchRequest by 0.6f;
     [Export] private float MovementSpeed = 3f;  // 3f seems like a normal walk speed for a human
     [Export] private bool CrouchModeIsToggle = false;
-    [Export] private float RotationSensitivity = 0.05f;
-    [Export] private bool RotationReverseX = false;
-    [Export] private float RotationMaxPitch = 70f;
 
     // Movement
     private float MovementStrength = 20f;   // gives best result. SprintRequest multiplies this by 0.4f
@@ -32,9 +29,6 @@ public class Player : KinematicBody
     private bool SprintRequest;
     private bool CrouchRequest;
     private bool oldCrouchRequest;
-
-    // Other
-    private int MouseModeAxisX() { return (RotationReverseX)?1:-1; }
 
     // Nodes
     private CollisionShape Body;
@@ -59,14 +53,6 @@ public class Player : KinematicBody
 
         Mouse.Hide();
         CrouchSetState(false);
-    }
-
-
-
-    // Godot : INPUT
-    public override void _Input(InputEvent @event)
-    {
-        InputSetRotation(@event);
     }
 
 
@@ -140,17 +126,6 @@ public class Player : KinematicBody
             return Input.IsActionJustPressed("jump");
         }
         return false;
-    }
-
-
-
-    // Rotation
-
-    private void RotationClampCamera()
-    {
-        var clamped = Head.RotationDegrees;
-        clamped.x = Mathf.Clamp(clamped.x, -RotationMaxPitch, RotationMaxPitch);
-        Head.RotationDegrees = clamped;
     }
 
 
@@ -363,18 +338,6 @@ public class Player : KinematicBody
 
 
     // Input
-
-    private void InputSetRotation(InputEvent @event)
-    {
-        if (@event is InputEventMouseMotion && Mouse.Hidden())
-        {
-            var mousemotion = @event as InputEventMouseMotion;
-            RotateY(Mathf.Deg2Rad(-mousemotion.Relative.x * RotationSensitivity));
-            Head.RotateX(Mathf.Deg2Rad(mousemotion.Relative.y * RotationSensitivity * MouseModeAxisX()));
-
-            RotationClampCamera();
-        }
-    }
 
     private bool InputAllowed()
     {

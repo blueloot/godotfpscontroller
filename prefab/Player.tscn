@@ -31,8 +31,7 @@ material/0 = null
 [node name="Head" type="Spatial" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0 )
 
-[node name="Camera" type="Camera" parent="Head"]
-current = true
+[node name="notinuse" type="Camera" parent="Head"]
 
 [node name="Body" type="CollisionShape" parent="."]
 shape = SubResource( 2 )
@@ -41,20 +40,13 @@ shape = SubResource( 2 )
 transform = Transform( 1, 0, 0, 0, -1.62921e-07, -1, 0, 1, -1.62921e-07, 0, -0.5, 0 )
 shape = SubResource( 3 )
 
-[node name="HeadBonkerOld" type="RayCast" parent="."]
-enabled = true
-cast_to = Vector3( 0, 1.05, 0 )
-__meta__ = {
-"_editor_description_": "raycast to check if there is a ceiling above player when it tries to stand after crouching"
-}
-
 [node name="JumpHelper" type="Area" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.2, 0 )
 __meta__ = {
 "_editor_description_": "helper so that player can jump under certain circumstances"
 }
 
-[node name="JumpHelperShape" type="CollisionShape" parent="JumpHelper"]
+[node name="CollisionShape" type="CollisionShape" parent="JumpHelper"]
 shape = SubResource( 4 )
 
 [node name="HeadBonker" type="Area" parent="."]
