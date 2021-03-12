@@ -13,6 +13,7 @@ ___
     [x] crouching
 
     [X] jumping
+        ! cannot jump when standing close to a wall
 
     [x] sprinting
 
@@ -24,8 +25,7 @@ ___
 
     [ ] camera bobbing
 
-    [/] slide if sprint + crouch
-        ! sliding up slopes should reduce momentum
+    [X] slide if sprint + crouch
 
 ___
 
