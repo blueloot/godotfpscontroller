@@ -71,7 +71,6 @@ public class Player : KinematicBody
 
         MovementProcess(delta);
         JumpProcess();
-        CrouchGetToggle();
         CrouchProcess(delta);
         SprintProcess();
         SlideProcess(delta);
@@ -146,21 +145,8 @@ public class Player : KinematicBody
         CrouchRequest = state;
         oldCrouchRequest = CrouchRequest;
 
-        // slide?
-        if (CrouchRequest && SprintRequest)
-        {
-            if (SlideAllowed())
-            {
-                SlideStart();
-                return;
-            }
-        }
-
-        // stop slide?
-        if (!CrouchRequest)
-        {
-            SlideStop();
-        }
+        SlideTryStart();
+        SlideTryStop();
     }
 
     private void CrouchGetToggle()
@@ -171,6 +157,12 @@ public class Player : KinematicBody
     }
 
     private void CrouchProcess(float delta)
+    {
+        CrouchGetToggle();
+        CrouchTry(delta);
+    }
+
+    private void CrouchTry(float delta)
     {
         CrouchWatchYourHead();
 
@@ -294,6 +286,7 @@ public class Player : KinematicBody
         }
         return false;
     }
+    
     private void SlideStart()
     {
         SlideSpeed = MovementSpeed * MoveSpeedSprint;
@@ -301,11 +294,13 @@ public class Player : KinematicBody
         SlideRest = 2f;
         return;
     }
+    
     private void SlideStop()
     {
         SlideRequest = false;
         return;
     }
+    
     private void SlideProcess(float delta)
     {
         if (SlideRequest)
@@ -321,6 +316,26 @@ public class Player : KinematicBody
         if (SlideRest > 0)
         {
             SlideRest -= 2f * delta;
+        }
+    }
+    
+    private void SlideTryStart()
+    {
+        if (CrouchRequest && SprintRequest)
+        {
+            if (SlideAllowed())
+            {
+                SlideStart();
+                return;
+            }
+        }
+    }
+    
+    private void SlideTryStop()
+    {
+        if (!CrouchRequest)
+        {
+            SlideStop();
         }
     }
 
@@ -352,7 +367,7 @@ public class Player : KinematicBody
         // check floor normal, and block jumping if angle is too steep
         JumpBlocked = false;
         SlideBlocked = false;
-        if (GetSlideCount() > 0)
+        if (GetSlideCount() == 1)
         {
             for (int i = 0; i < GetSlideCount(); i++)
             {
