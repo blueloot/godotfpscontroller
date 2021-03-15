@@ -6,7 +6,7 @@ public class Mouse : Node
     public bool Visible { get { return Input.GetMouseMode() == Input.MouseMode.Visible;  } }
     public bool Hidden  { get { return Input.GetMouseMode() == Input.MouseMode.Captured; } }
 
-    PlayerInput PlayerInput;
+    private PlayerInput PlayerInput;
 
     public override void _Ready()
     {
