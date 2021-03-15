@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://script/Player.cs" type="Script" id=1]
 
@@ -17,6 +17,9 @@ height = 0.6
 
 [sub_resource type="CylinderShape" id=5]
 radius = 0.5
+
+[sub_resource type="CapsuleShape" id=6]
+radius = 0.3
 
 [node name="Player" type="KinematicBody"]
 script = ExtResource( 1 )
@@ -51,3 +54,8 @@ shape = SubResource( 4 )
 
 [node name="CollisionShape" type="CollisionShape" parent="HeadBonker"]
 shape = SubResource( 5 )
+
+[node name="Feet2" type="CollisionShape" parent="."]
+transform = Transform( 1, 0, 0, 0, -1.62921e-07, 1, 0, -1, -1.62921e-07, 0, -0.8, 0 )
+shape = SubResource( 6 )
+disabled = true

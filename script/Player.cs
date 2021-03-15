@@ -18,6 +18,7 @@ public class Player : KinematicBody
     private Vector3 Direction;
     private float SlideSpeed;
     private float SlideRest;
+    private bool Grounded;
 
     // Block certain stuff
     private float MaxSlopeThresholdAllowed = 0.65f; // 1.0f is flat (floor),  0.0f is vertical (wall)
@@ -69,12 +70,40 @@ public class Player : KinematicBody
     {
         Mouse.HideShow();
 
+        GroundCheck();
         MovementProcess(delta);
         JumpProcess();
         CrouchGetToggle();
         CrouchProcess(delta);
         SprintProcess();
         SlideProcess(delta);
+    }
+
+    private void GroundCheck()
+    {
+        Grounded = false;
+        JumpBlocked = false;
+        SlideBlocked = false;
+
+        var aaa = GetNode<CollisionShape>("Feet2");
+        Body.Disabled = true;
+        aaa.Disabled = false;
+        var bbb = aaa.Shape as CapsuleShape;
+        
+        if (GetSlideCount() > 0 || JumpHelper.GetOverlappingBodies().Count != 1)
+        {
+            Grounded = true;
+
+            for (var i = 0; i < GetSlideCount(); i++)
+            {
+                if (GetSlideCollision(i).Normal.y < MaxSlopeThresholdAllowed)
+                {
+                    JumpBlocked = true;
+                }
+            }
+        }
+        aaa.Disabled = true;
+        Body.Disabled = false;
     }
 
 
@@ -112,7 +141,8 @@ public class Player : KinematicBody
         JumpRequest = false;
 
         // exit if JumpHelper only collides with 1 body (player) because it means player is airborne
-        if (JumpHelper.GetOverlappingBodies().Count == 1){ return; }
+        // if (JumpHelper.GetOverlappingBodies().Count == 1){ return; }
+        if (!Grounded) { return; }
 
         // exit if crouched and not allowed to stand
         if (CrouchRequest && HeadBonker.GetOverlappingBodies().Count != 1) { return; }
@@ -294,6 +324,7 @@ public class Player : KinematicBody
         }
         return false;
     }
+    
     private void SlideStart()
     {
         SlideSpeed = MovementSpeed * MoveSpeedSprint;
@@ -301,11 +332,13 @@ public class Player : KinematicBody
         SlideRest = 2f;
         return;
     }
+    
     private void SlideStop()
     {
         SlideRequest = false;
         return;
     }
+    
     private void SlideProcess(float delta)
     {
         if (SlideRequest)
@@ -350,19 +383,19 @@ public class Player : KinematicBody
         MoveAndSlide(Velocity, Vector3.Up, false, 4, 0.785398f, false);
 
         // check floor normal, and block jumping if angle is too steep
-        JumpBlocked = false;
-        SlideBlocked = false;
-        if (GetSlideCount() > 0)
-        {
-            for (int i = 0; i < GetSlideCount(); i++)
-            {
-                if (GetSlideCollision(i).Normal.y < MaxSlopeThresholdAllowed)
-                {
-                    JumpBlocked = true;
-                    SlideBlocked = true;
-                }
-            }
-        }
+        // JumpBlocked = false;
+        // SlideBlocked = false;
+        // if (GetSlideCount() > 0)
+        // {
+        //     for (int i = 0; i < GetSlideCount(); i++)
+        //     {
+        //         if (GetSlideCollision(i).Normal.y < MaxSlopeThresholdAllowed)
+        //         {
+        //             // JumpBlocked = true;
+        //             // SlideBlocked = true;
+        //         }
+        //     }
+        // }
     }
 
     private bool Floored()
