@@ -1,9 +1,9 @@
 using Godot;
 using System;
 
-public class PlayerCamera : Camera
+public class PlayerRotate : Node
 {
-    [Export] private NodePath PlayerNode = "";
+    [Export] private NodePath PlayerBody = "..";
     [Export] private float RotationSensitivity = 0.1f;
     [Export] private bool RotationReverseX = false;
     [Export] private float RotationMaxPitch = 70f;
@@ -22,8 +22,8 @@ public class PlayerCamera : Camera
         PlayerInput = GetNode<PlayerInput>("/root/PlayerInput");
         Mouse = GetNode<Mouse>("/root/Mouse");
 
-        Body = GetNode<KinematicBody>(PlayerNode);
-        Head = GetParent<Spatial>();
+        Body = GetNode<KinematicBody>(PlayerBody);
+        Head = GetNode<Spatial>(PlayerBody+"/Head");
     }
 
     public override void _Input(InputEvent @event)

@@ -1,8 +1,10 @@
 using Godot;
 using System;
 
-public class Player : KinematicBody
+public class PlayerWalking : Node
 {
+    [Export] public float MovementSpeed = 3f;
+
     PlayerInput PlayerInput;
     Mouse Mouse;
 
@@ -10,8 +12,6 @@ public class Player : KinematicBody
     {
         PlayerInput = GetNode<PlayerInput>("/root/PlayerInput");
         Mouse = GetNode<Mouse>("/root/Mouse");
-
-        Mouse.Hide();
     }
 
     public override void _Process(float delta)

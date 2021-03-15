@@ -1,11 +1,12 @@
-[gd_scene load_steps=17 format=2]
+[gd_scene load_steps=18 format=2]
 
 [ext_resource path="res://script/Player.cs" type="Script" id=1]
 [ext_resource path="res://prefab/Floor.tscn" type="PackedScene" id=2]
 [ext_resource path="res://prefab/Wall.tscn" type="PackedScene" id=3]
 [ext_resource path="res://grid01.png" type="Texture" id=4]
-[ext_resource path="res://script/PlayerCamera.cs" type="Script" id=5]
+[ext_resource path="res://script/PlayerRotate.cs" type="Script" id=5]
 [ext_resource path="res://script/MovingPlatform.cs" type="Script" id=6]
+[ext_resource path="res://script/PlayerWalking.cs" type="Script" id=7]
 
 [sub_resource type="BoxShape" id=1]
 
@@ -306,11 +307,15 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.55826, 3.45581, 4.47169 )
 [node name="Body" type="KinematicBody" parent="Player"]
 script = ExtResource( 1 )
 
+[node name="Rotate" type="Node" parent="Player/Body"]
+script = ExtResource( 5 )
+
+[node name="Walking" type="Node" parent="Player/Body"]
+script = ExtResource( 7 )
+
 [node name="Head" type="Spatial" parent="Player/Body"]
 
 [node name="Camera" type="Camera" parent="Player/Body/Head"]
-script = ExtResource( 5 )
-PlayerNode = NodePath("../..")
 
 [node name="ColliderBody" type="CollisionShape" parent="Player/Body"]
 shape = SubResource( 10 )
