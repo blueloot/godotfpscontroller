@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class Camera : Godot.Camera
+public class _old_Camera : Godot.Camera
 {
 
     [Export] private NodePath Player;

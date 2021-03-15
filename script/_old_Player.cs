@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class Player : KinematicBody
+public class _old_Player : KinematicBody
 {
     // Exports
     [Export] private float Gravity = -42f;
