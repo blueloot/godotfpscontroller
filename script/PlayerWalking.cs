@@ -9,8 +9,8 @@ public class PlayerWalking : Node
     private Spatial Head;
 
     // Exports
-    [Export] public float MovementSpeed = 7f;
-    [Export] private float Accelleration = 7f;
+    [Export] public float MovementSpeed = 9f;
+    [Export] private float Accelleration = 20f;
     [Export] private float Friction = 0.9f;
 
     // Singletons

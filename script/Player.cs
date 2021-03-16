@@ -10,10 +10,13 @@ public class Player : KinematicBody
     public Vector3 GroundVector;
     public Vector3 Velocity;
     public Vector3 MoveDirection;
+    public Vector3 MoveVelocity;
     public bool Grounded;
 
     private float GroundCheckDistance = 5f;
     private float GroundSnap;
+
+    private bool test;
 
     private CapsuleShape Body;
 
@@ -35,7 +38,6 @@ public class Player : KinematicBody
 
     public override void _PhysicsProcess(float delta)
     {
-
         // Ground check
         if (IsOnFloor())
         {
@@ -61,23 +63,22 @@ public class Player : KinematicBody
             for (int i = 0; i < GetSlideCount(); i++)
             {
                 var col = GlobalTransform.origin.y - GetSlideCollision(i).Position.y;
-                var stairjump = Gravity/10;
                 var bodysize = Body.Height/2;
                 var stairnormal = Body.Height/MaxStepThresholdAllowed;
 
-                if (col > bodysize - stairnormal && col < bodysize + stairnormal)
+                if (col > bodysize - stairnormal && col < bodysize + stairnormal +.1f)
                 {
-                    if (MoveDirection != Vector3.Zero)
+                    if (MoveVelocity.y >= 0f && MoveDirection != Vector3.Zero)
                     {
                         GroundSnap = 1f;
-                        GroundVector = Vector3.Up * stairjump;
+                        GroundVector.y = GetFloorNormal().y * 6f;
                     }
                 }
             }
         }
 
         // update
-        var linvel = new Vector3(Velocity.x + GroundVector.x, GroundVector.y, Velocity.z + GroundVector.z);
-        MoveAndSlide(linvel, Vector3.Up, false, 4, MaxSlopeThresholdAllowed, false);
+        MoveVelocity = new Vector3(Velocity.x + GroundVector.x, GroundVector.y, Velocity.z + GroundVector.z);
+        MoveVelocity = MoveAndSlide(MoveVelocity, Vector3.Up, false, 4, MaxSlopeThresholdAllowed, false);
     }
 }

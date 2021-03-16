@@ -303,7 +303,7 @@ playback_process_mode = 0
 "anims/New Anim" = SubResource( 9 )
 
 [node name="OmniLight" type="OmniLight" parent="Level"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.09121, 10.0855, -5.04796 )
 shadow_enabled = true
 omni_range = 31.0
 
