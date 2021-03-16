@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=2]
+[gd_scene load_steps=19 format=2]
 
 [ext_resource path="res://script/Player.cs" type="Script" id=1]
 [ext_resource path="res://prefab/Floor.tscn" type="PackedScene" id=2]
@@ -53,7 +53,13 @@ tracks/0/keys = {
 "values": [ Vector3( 0, 0, 0 ), Vector3( 0, 0, 0 ), Vector3( 0, 10, 0 ), Vector3( 0, 10, 0 ), Vector3( 0, 0, 0 ) ]
 }
 
-[sub_resource type="BoxShape" id=10]
+[sub_resource type="CapsuleShape" id=10]
+radius = 0.5
+height = 2.0
+
+[sub_resource type="CapsuleMesh" id=13]
+radius = 0.5
+mid_height = 2.0
 
 [node name="Main" type="Spatial"]
 
@@ -307,15 +313,23 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.55826, 3.45581, 4.47169 )
 [node name="Body" type="KinematicBody" parent="Player"]
 script = ExtResource( 1 )
 
+[node name="Movement" type="Node" parent="Player/Body"]
+script = ExtResource( 7 )
+
 [node name="Rotate" type="Node" parent="Player/Body"]
 script = ExtResource( 5 )
 
-[node name="Walking" type="Node" parent="Player/Body"]
-script = ExtResource( 7 )
-
 [node name="Head" type="Spatial" parent="Player/Body"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0 )
 
 [node name="Camera" type="Camera" parent="Player/Body/Head"]
 
-[node name="ColliderBody" type="CollisionShape" parent="Player/Body"]
+[node name="Body" type="CollisionShape" parent="Player/Body"]
+transform = Transform( 1, 0, 0, 0, -1.62921e-07, 1, 0, -1, -1.62921e-07, 0, 0, 0 )
 shape = SubResource( 10 )
+
+[node name="Mesh" type="MeshInstance" parent="Player/Body"]
+transform = Transform( 1, 0, 0, 0, -1.62921e-07, 1, 0, -1, -1.62921e-07, 0, 0, 0 )
+cast_shadow = 3
+mesh = SubResource( 13 )
+material/0 = null
