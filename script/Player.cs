@@ -16,8 +16,6 @@ public class Player : KinematicBody
     private float GroundCheckDistance = 5f;
     private float GroundSnap;
 
-    private bool test;
-
     private CapsuleShape Body;
 
     // Singletons
@@ -41,24 +39,38 @@ public class Player : KinematicBody
         // Ground check
         if (IsOnFloor())
         {
+            // Landing
+            if (!Grounded)
+            {
+                Velocity.x *= .5f;  // reduce velocity slightly
+                Velocity.z *= .5f;  // TODO : adjust additionally based on landing impact strength
+            }
+            // On floor
             Grounded = true;
             GroundVector = -GetFloorNormal() * GroundSnap;
             GroundSnap = GroundCheckDistance;
         }
         else
         {
+            // In air
             Grounded = false;
             GroundVector += Vector3.Down * Gravity * delta;
         }
 
-        // Ground Control
-        if (PlayerInput.GetJump() && Grounded)      // jumping | TODO: add cooldown
+        // Jumping
+        // TODO : Add a cooldown time to prevent continuous jumping (e.g. jumping up a ledge)
+        // TODO : Consider reducing jump strength by some value of previous landing impact
+        if (PlayerInput.GetJump() && Grounded)
         {
             Grounded = false;
             GroundSnap = 1f;
-            GroundVector = Vector3.Up * 12f;
+            GroundVector = Vector3.Up * 12f; // temporary jump strength of 12f for testing purpose
         }
-        if (GetSlideCount() > 0 && Grounded)        // stairs
+
+        // Stair control
+        //  was trying to have it check for collision with the lower hemisphere of the collider sphere
+        //  might need to redo this, but not now..
+        if (GetSlideCount() > 0 && Grounded)
         {
             for (int i = 0; i < GetSlideCount(); i++)
             {
@@ -71,13 +83,13 @@ public class Player : KinematicBody
                     if (MoveVelocity.y >= 0f && MoveDirection != Vector3.Zero)
                     {
                         GroundSnap = 1f;
-                        GroundVector.y = GetFloorNormal().y * 6f;
+                        GroundVector.y = GetFloorNormal().y * 6f; // this 6f seems to help, but I don't think it's universal
                     }
                 }
             }
         }
 
-        // update
+        // Update movement
         MoveVelocity = new Vector3(Velocity.x + GroundVector.x, GroundVector.y, Velocity.z + GroundVector.z);
         MoveVelocity = MoveAndSlide(MoveVelocity, Vector3.Up, false, 4, MaxSlopeThresholdAllowed, false);
     }
