@@ -52,7 +52,7 @@ public class Player : KinematicBody
         }
 
         // Ground Control
-        if (PlayerInput.GetJump() && Grounded)      // jumping
+        if (PlayerInput.GetJump() && Grounded)      // jumping | TODO: add cooldown
         {
             Grounded = false;
             GroundSnap = 1f;

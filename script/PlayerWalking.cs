@@ -1,5 +1,5 @@
-using Godot;
 using System;
+using Godot;
 
 public class PlayerWalking : Node
 {
@@ -9,9 +9,10 @@ public class PlayerWalking : Node
     private Spatial Head;
 
     // Exports
-    [Export] public float MovementSpeed = 9f;
-    [Export] private float Accelleration = 20f;
-    [Export] private float Friction = 0.9f;
+    [Export] public float MoveSpeed = 3f;
+    [Export] private float GroundStrength = 10f;
+    [Export] private float AirStrength = 5f;
+    private float Friction = 0.9f;
 
     // Singletons
     PlayerInput PlayerInput;
@@ -32,15 +33,20 @@ public class PlayerWalking : Node
         var movement = PlayerInput.GetMovement();
         var transform = Player.GlobalTransform;
 
-        Player.MoveDirection = (Player.Grounded) ? Vector3.Zero : Player.MoveDirection;
+        Player.MoveDirection = Vector3.Zero;
         Player.MoveDirection += -transform.basis.z * movement.y;
         Player.MoveDirection +=  transform.basis.x * movement.x;
         Player.MoveDirection = Player.MoveDirection.Normalized();
 
-        var targetVel = Player.MoveDirection * MovementSpeed;
-
-        Player.Velocity = Player.Velocity.LinearInterpolate( targetVel, Accelleration * delta);
-        
-        if (movement == Vector2.Zero) Player.Velocity *= Friction;
+        if (Player.Grounded)
+        {
+            var targetVel = Player.MoveDirection * MoveSpeed;
+            Player.Velocity = Player.Velocity.LinearInterpolate( targetVel, GroundStrength * delta);
+            // if (movement == Vector2.Zero) Player.Velocity *= Friction;
+        }
+        else
+        {
+            Player.Velocity += Player.MoveDirection * AirStrength * delta; // clamp?
+        }
     }
 }
