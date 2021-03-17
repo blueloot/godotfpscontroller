@@ -10,9 +10,7 @@ public class PlayerRotate : Node
 
     private int MouseModeAxisX { get {  return (RotationReverseX)?1:-1; } }
 
-    private Mouse Mouse;
     private PlayerInput PlayerInput;
-
     private Spatial Head;
     private KinematicBody Body;
 
@@ -20,7 +18,6 @@ public class PlayerRotate : Node
     public override void _Ready()
     {
         PlayerInput = GetNode<PlayerInput>("/root/PlayerInput");
-        Mouse = GetNode<Mouse>("/root/Mouse");
 
         Body = GetNode<KinematicBody>(PlayerBody);
         Head = GetNode<Spatial>(PlayerBody+"/Head");
@@ -28,7 +25,7 @@ public class PlayerRotate : Node
 
     public override void _Input(InputEvent @event)
     {
-        if (@event is InputEventMouseMotion && Mouse.Hidden)
+        if (@event is InputEventMouseMotion && PlayerInput.Allowed())
         {
             var mousemotion = @event as InputEventMouseMotion;
             Body.RotateY(Mathf.Deg2Rad(-mousemotion.Relative.x * RotationSensitivity));
