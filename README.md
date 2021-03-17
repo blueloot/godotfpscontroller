@@ -6,33 +6,30 @@
 
 ___
 
-    to do list
+    todo list
+        ..more to come
 
-    [x] walking
+    ground actions
+        [x] walking
+        [x] slopes
+        [/] stairs (needs revision ..some day)
+        [ ] crouching
+        [ ] sprinting
+        [ ] climbing
 
-    [x] crouching
+    air actions
+        [x] movement
+        [/] jumping (added, but not final)
+        [x] ground impact decrease velocity
+        [ ] ground impact limit jumping
+        [ ] ground impact fall damage
 
-    [X] jumping
-        ! cannot jump when standing close to a wall
+    camera actions
+        [ ] lean
+        [ ] bob
 
-    [x] sprinting
-
-    [ ] climbing?
-
-    [ ] fall damage
-
-    [ ] rigidbody interaction and damage
-
-    [ ] camera bobbing
-
-    [X] slide if sprint + crouch
-
-___
-
-    what you can find in this demo:
-
-    some moving platforms to try walking on
-    some pillars to test jumping
-    a stair to test collision with
-    an arch to crouch under
-    some slopes to test collision with
+    audio action cues
+        [ ] footsteps
+        [ ] footslides/turning
+        [ ] jump/fall
+        [ ] ground has different material
