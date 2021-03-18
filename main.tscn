@@ -325,7 +325,7 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0 )
 [node name="Camera" type="Camera" parent="Player/Body/Head"]
 
 [node name="Body" type="CollisionShape" parent="Player/Body"]
-transform = Transform( 1, 0, 0, 0, -1.62921e-07, 1, 0, -1, -1.62921e-07, 0, 0, 0 )
+transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0 )
 shape = SubResource( 10 )
 
 [node name="Mesh" type="MeshInstance" parent="Player/Body"]

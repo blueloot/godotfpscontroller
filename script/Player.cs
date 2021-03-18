@@ -6,13 +6,13 @@ public class Player : KinematicBody
     // Properties
     [Export] private float Gravity = 42f;
     [Export] private float MaxSlopeThresholdAllowed = 0.7f;
-    [Export] private float MaxStepThresholdAllowed = 10f;
     public Vector3 GroundVector;
     public Vector3 Velocity;
     public Vector3 MoveDirection;
     public Vector3 MoveVelocity;
     public bool Grounded;
 
+    private float MaxStepThresholdAllowed = 20f;
     private float GroundCheckDistance = 5f;
     private float GroundSnap;
 
@@ -43,7 +43,7 @@ public class Player : KinematicBody
             if (!Grounded)
             {
                 Velocity.x *= .5f;  // reduce velocity slightly
-                Velocity.z *= .5f;  // TODO : adjust additionally based on landing impact strength
+                Velocity.z *= .5f;  // TODO: adjust additionally based on landing impact strength
             }
             // On floor
             Grounded = true;
@@ -58,8 +58,8 @@ public class Player : KinematicBody
         }
 
         // Jumping
-        // TODO : Add a cooldown time to prevent continuous jumping (e.g. jumping up a ledge)
-        // TODO : Consider reducing jump strength by some value of previous landing impact
+        // TODO: Add a cooldown time to prevent continuous jumping (e.g. jumping up a ledge)
+        // TODO: Consider reducing jump strength by some value of previous landing impact
         if (PlayerInput.GetJump() && Grounded)
         {
             Grounded = false;

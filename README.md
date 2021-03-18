@@ -1,9 +1,9 @@
 # First person player controller
 
     fps controller for a game I want to make in godot
+    (3.2.3 mono)
 
     work in progress
-
 ___
 
     todo list
@@ -14,8 +14,9 @@ ___
         [x] slopes
         [/] stairs (needs revision ..some day)
         [ ] crouching
-        [ ] sprinting
+        [x] sprinting
         [ ] climbing
+        [ ] sliding
 
     air actions
         [x] movement
