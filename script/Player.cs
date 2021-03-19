@@ -60,6 +60,7 @@ public class Player : KinematicBody
         // Jumping
         // TODO: Add a cooldown time to prevent continuous jumping (e.g. jumping up a ledge)
         // TODO: Consider reducing jump strength by some value of previous landing impact
+        // TODO: If head collide with ceiling set yvel to 0 to prevent stickiness
         if (PlayerInput.GetJump() && Grounded)
         {
             Grounded = false;

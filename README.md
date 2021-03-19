@@ -13,7 +13,7 @@ ___
         [x] walking
         [x] slopes
         [/] stairs (needs revision ..some day)
-        [ ] crouching
+        [x] crouching
         [x] sprinting
         [ ] climbing
         [ ] sliding
