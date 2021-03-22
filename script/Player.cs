@@ -40,6 +40,7 @@ public class Player : KinematicBody
         if (IsOnFloor())
         {
             // Landing
+            // TODO: should remove crouch state
             if (!Grounded)
             {
                 Velocity.x *= .5f;  // reduce velocity slightly
@@ -69,8 +70,8 @@ public class Player : KinematicBody
         }
 
         // Stair control
-        //  was trying to have it check for collision with the lower hemisphere of the collider sphere
-        //  might need to redo this, but not now..
+        // TODO: Needs rework
+        // BUG: cannot walk stairs if crouched
         if (GetSlideCount() > 0 && Grounded)
         {
             for (int i = 0; i < GetSlideCount(); i++)

@@ -12,13 +12,17 @@ public class PlayerWalking : Node
 
     // Properties
     [Export] public float MoveSpeed = 3f;
-    [Export] public float RunSpeedMultiplier = 2.2f;
+    [Export] public float RunSpeedMultiplier = 2.5f;
     [Export] public float CrouchSpeedMultiplier = 0.55f;
     [Export] private bool CrouchModeIsToggle = false;
 
-    private float GroundStrength = 10f; // TODO: change by ground material
+    private float GroundStrength = 10f; // TODO: changed by ground material
     private float AirStrength = 12f;
-
+    
+    private float SlideSpeed;
+    private float SlideCooldown;
+    private bool SlideBlocked;
+    private bool SlideRequest;
     public bool SprintRequest;
     public bool CrouchRequest;
     private bool oldCrouchRequest;
@@ -48,63 +52,114 @@ public class PlayerWalking : Node
         CrouchSetState(false);
     }
 
-    private void CrouchSetState(bool state)
-    {
-        CrouchRequest = state;
-        oldCrouchRequest = CrouchRequest;
-
-        // // slide?
-        // if (CrouchRequest && SprintRequest)
-        // {
-        //     if (SlideAllowed())
-        //     {
-        //         SlideStart();
-        //         return;
-        //     }
-        // }
-
-        // // stop slide?
-        // if (!CrouchRequest)
-        // {
-        //     SlideStop();
-        // }
-    }
-
     public override void _PhysicsProcess(float delta)
     {
         Player Player = GetNode<Player>(PlayerBody);
 
-        // sprint
-        SprintRequest = PlayerInput.GetSprint();
+        SprintProcess();
 
-        // crouch
-        CrouchGetInput();
         CrouchProcess(delta);
 
-        // movement direction
+        SlideProcess(delta);
+
+        // movement direction (only update if not sliding)
         var movement = PlayerInput.GetMovement();
         var transform = Player.GlobalTransform;
-        Player.MoveDirection = Vector3.Zero;
-        Player.MoveDirection += -transform.basis.z * movement.y;
-        Player.MoveDirection +=  transform.basis.x * movement.x;
-        Player.MoveDirection = Player.MoveDirection.Normalized();
+        Player.MoveDirection = (!SlideRequest && Player.Grounded) ? Vector3.Zero : Player.MoveDirection;
+        if (!SlideRequest && Player.Grounded)
+        {
+            Player.MoveDirection += -transform.basis.z * movement.y;
+            Player.MoveDirection +=  transform.basis.x * movement.x;
+            Player.MoveDirection = Player.MoveDirection.Normalized();
+        }
+
+        var JumpRequest = !Player.Grounded;
 
         // movement strength
-        if (Player.Grounded)
-        {
+        // if (Player.Grounded)
+        // {
             // get speed
             var speed = MoveSpeed;
                 speed = (SprintRequest ? MoveSpeed * RunSpeedMultiplier : speed);
                 speed = (CrouchRequest ? MoveSpeed * CrouchSpeedMultiplier : speed);
+                speed = (SlideRequest  ? SlideSpeed : speed);
 
             // apply speed
-            var targetVel = Player.MoveDirection * speed;
+            var targetVel = Player.MoveDirection * speed * (JumpRequest?1.5f:1);
             Player.Velocity = Player.Velocity.LinearInterpolate( targetVel, GroundStrength * delta);
-        }
-        else
+        // }
+        // else
+        // {
+        //     Player.Velocity += Player.MoveDirection * AirStrength * delta; // TODO: clamp value to prevent infinte speed
+        // }
+    }
+
+    private void SprintProcess()
+    {
+        // TODO: change camera fov
+        SprintRequest = PlayerInput.GetSprint();
+    }
+
+    private void SlideProcess(float delta)
+    {
+        // BUG: if sprint+crouch is held and slide is requested but is on cooldown. it will activate anyway as soon as cd is over. it shouldn't
+        // BUG: if player stand still and sprint+crouch is held, it will not move
+        // TODO: consider only allowed to slide if player has sprinted for a certain amount of time
+        // TODO: sliding up slopes should decrease slide speed more and sliding down slopes should increase slide speed slightly (depending on ground material)
+        if (CrouchRequest && SprintRequest)
         {
-            Player.Velocity += Player.MoveDirection * AirStrength * delta; // TODO: clamp value to prevent infinte speed
+            if (SlideAllowed())
+            {
+                SlideStart();
+                return;
+            }
         }
+
+        if (!CrouchRequest)
+        {
+            SlideStop();
+            SlideBlocked = false;
+        }
+
+
+        if (SlideRequest)
+        {
+            SlideSpeed -= GroundStrength * delta;
+
+            if (SlideSpeed <= 0f)
+            {
+                SlideStop();
+            }
+        }
+
+        if (SlideCooldown > 0)
+        {
+            SlideCooldown -= 2f * delta; // random number 2f for now..
+        }
+    }
+
+    private void SlideStop()
+    {
+        SlideRequest = false;
+    }
+
+    private void SlideStart()
+    {
+        SlideSpeed = MoveSpeed * RunSpeedMultiplier * 2;
+        SlideRequest = true;
+        SlideCooldown = 2f;
+        SlideBlocked = true;
+    }
+
+    private bool SlideAllowed()
+    {
+        return (SlideCooldown <= 0f && !SlideBlocked);
+    }
+
+    private void CrouchSetState(bool state)
+    {
+        CrouchRequest = state;
+        oldCrouchRequest = CrouchRequest;
     }
 
     private void CrouchGetInput()
@@ -138,6 +193,12 @@ public class PlayerWalking : Node
     }
 
     private void CrouchProcess(float delta)
+    {
+        CrouchGetInput();
+        CrouchSitStand(delta);
+    }
+
+    private void CrouchSitStand(float delta)
     {
         CrouchWatchYourHead();
 

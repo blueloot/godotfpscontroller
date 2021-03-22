@@ -16,14 +16,14 @@ ___
         [x] crouching
         [x] sprinting
         [ ] climbing
-        [ ] sliding
+        [/] sliding (added, but not final)
 
     air actions
-        [x] movement
         [/] jumping (added, but not final)
         [x] ground impact decrease velocity
         [ ] ground impact limit jumping
         [ ] ground impact fall damage
+        [-] movement -removed-
 
     camera actions
         [ ] lean
