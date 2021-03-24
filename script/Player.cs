@@ -12,7 +12,6 @@ public class Player : KinematicBody
     public Vector3 MoveVelocity;
     public bool Grounded;
 
-    private float MaxStepThresholdAllowed = 20f;
     private float GroundCheckDistance = 5f;
     private float GroundSnap;
 
@@ -70,17 +69,12 @@ public class Player : KinematicBody
         }
 
         // Stair control
-        // TODO: Needs rework
-        // BUG: cannot walk stairs if crouched
         if (GetSlideCount() > 0 && Grounded)
         {
             for (int i = 0; i < GetSlideCount(); i++)
             {
                 var col = GlobalTransform.origin.y - GetSlideCollision(i).Position.y;
-                var bodysize = Body.Height/2;
-                var stairnormal = Body.Height/MaxStepThresholdAllowed;
-
-                if (col > bodysize - stairnormal && col < bodysize + stairnormal +.1f)
+                if (col >= 1 && col <= 1.05f) // threshold of 0.05f seems to work best for stair step size of 0.25 unit
                 {
                     if (MoveVelocity.y >= 0f && MoveDirection != Vector3.Zero)
                     {
