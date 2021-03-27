@@ -12,7 +12,7 @@ ___
     ground actions
         [x] walking
         [x] slopes
-        [/] stairs (needs revision ..some day)
+        [/] stairs (needs revision)
         [x] crouching
         [x] sprinting
         [ ] climbing
@@ -23,7 +23,6 @@ ___
         [x] ground impact decrease velocity
         [ ] ground impact limit jumping
         [ ] ground impact fall damage
-        [-] movement -removed-
 
     camera actions
         [ ] lean
