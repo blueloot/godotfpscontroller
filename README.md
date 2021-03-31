@@ -1,7 +1,7 @@
 # First person player controller
 
     fps controller for a game I want to make in godot
-    (3.2.3 mono)
+    (3.3 mono)
 
     work in progress
 ___
@@ -12,7 +12,9 @@ ___
     ground actions
         [x] walking
         [x] slopes
-        [/] stairs (needs revision)
+        [/] stairs
+            - sometimes fail if sprinting
+            - does not work for all stepsize or playersize
         [x] crouching
         [x] sprinting
         [ ] climbing

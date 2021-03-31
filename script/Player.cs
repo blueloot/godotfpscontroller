@@ -7,32 +7,35 @@ public class Player : KinematicBody
     // Properties
     [Export] private float Gravity = 42f;
     [Export] private float MaxSlopeThresholdAllowed = 0.7f;
-    [Export] public float MoveSpeed = 3f;
-    [Export] public float RunSpeedMultiplier = 2.5f;
-    [Export] public float CrouchSpeedMultiplier = 0.55f;
+    [Export] private float MoveSpeed = 3f;
+    [Export] private float RunSpeedMultiplier = 2.5f;
+    [Export] private float CrouchSpeedMultiplier = 0.55f;
     [Export] private bool CrouchModeIsToggle = false;
     [Export] private float JumpStrength = 12f;
     [Export] private float StepSize = 0.2f;
-    public Vector3 GroundVector;
-    public Vector3 Velocity;
-    public Vector3 MoveDirection;
-    public Vector3 MoveVelocity;
-    public bool Grounded;
+    private float FallSpeedForceStand = 17f; // if fall speed exceeds this velocity, player is forced to stand (if crouched)
+    private Vector3 GroundVector;
+    private Vector3 Velocity;
+    private Vector3 MoveDirection;
+    private Vector3 MoveVelocity;
+    private bool Grounded;
 
     private float GroundStrength = 10f; // TODO: changed by ground material
     private float GroundCheckDistance = 5f;
     private float AirStrength = 12f;
 
-    public float GroundSnap;
+    private float GroundSnap;
     private float SlideSpeed;
     private float SlideCooldown;
     private bool SlideBlocked;
     private bool SlideRequest;
-    public bool SprintRequest;
-    public bool CrouchRequest;
+    private bool SprintRequest;
+    private bool CrouchRequest;
     private bool oldCrouchRequest;
 
     private float CrouchTransitionSpeed = 6f;
+    private float CrouchCooldown = 0f;
+    private float CrouchCooldownTimer = 0.5f; // certain events trigger cooldown of crouch, set length of cooldown time
     private float HeightBodyCrouching = 1.0f; // size of collider when crouched
     private float HeightHeadCrouching = -0.2f; // position of head in local space when crouched
     private float HeightBodyStanding; // grabbed automatically from editor
@@ -130,11 +133,15 @@ public class Player : KinematicBody
         if (IsOnFloor())
         {
             // Landing
-            // TODO: should remove crouch state
             if (!Grounded)
             {
-                Velocity.x *= .5f;  // reduce velocity slightly
-                Velocity.z *= .5f;  // TODO: adjust additionally based on landing impact strength
+                // force remove crouched state
+                if (GroundVector.y < 0-FallSpeedForceStand)  CrouchSetState(false, CrouchCooldownTimer);
+
+                // reduce movement velocity slightly
+                // TODO: adjust additionally based on landing impact strength
+                Velocity.x *= .5f;
+                Velocity.z *= .5f;
             }
             // On floor
             Grounded = true;
@@ -159,8 +166,6 @@ public class Player : KinematicBody
                 var collisionPos = GetSlideCollision(i).Position - GlobalTransform.origin;
                 var bottom = -(HeightBodyStanding+0.5f)*0.5f;
                 var stepsize = -1f+StepSize;
-
-                var yOffset = GetSlideCollision(i).Position.y - (GlobalTransform.origin.y - (HeightBodyStanding/2)) * -1;
                 
                 if (collisionPos.y > bottom && collisionPos.y < stepsize)
                 {
@@ -170,7 +175,7 @@ public class Player : KinematicBody
                     if (Velocity.Dot(GetSlideCollision(i).Normal) < -1.0f)
                     {
                         GroundSnap = 1f;
-                        // TODO: consider applying a full reposition of body in relation to an offset
+                        // NOTE: consider applying a full reposition of body in relation to an offset
                         //       but for now, adds a constant "jumpforce" of 6f.
                         GroundVector.y = GetFloorNormal().y * 6f;
                     }
@@ -265,10 +270,14 @@ public class Player : KinematicBody
         }
     }
 
-    private void CrouchSetState(bool state)
+    private void CrouchSetState(bool state, float timer = 0f)
     {
-        CrouchRequest = state;
-        oldCrouchRequest = CrouchRequest;
+        if (CrouchCooldown <= 0f)
+        {
+            CrouchRequest = state;
+            oldCrouchRequest = CrouchRequest;
+            CrouchCooldown = timer;
+        }
     }
 
     private void CrouchGetInput()
@@ -303,6 +312,10 @@ public class Player : KinematicBody
 
     private void CrouchProcess(float delta)
     {
+        if (CrouchCooldown > 0f)
+        {
+            CrouchCooldown -= 1 * delta;
+        }
         CrouchGetInput();
         CrouchSitStand(delta);
     }
