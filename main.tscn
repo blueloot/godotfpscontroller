@@ -52,22 +52,22 @@ tracks/0/keys = {
 "values": [ Vector3( 0, 0, 0 ), Vector3( 0, 0, 0 ), Vector3( 0, 10, 0 ), Vector3( 0, 10, 0 ), Vector3( 0, 0, 0 ) ]
 }
 
-[sub_resource type="CylinderShape" id=14]
+[sub_resource type="CylinderShape" id=10]
 
-[sub_resource type="CylinderMesh" id=15]
+[sub_resource type="CylinderMesh" id=11]
 
-[sub_resource type="CapsuleShape" id=10]
+[sub_resource type="CapsuleShape" id=12]
 radius = 0.5
 height = 2.0
 
-[sub_resource type="CapsuleMesh" id=11]
+[sub_resource type="CapsuleMesh" id=13]
 radius = 0.5
 mid_height = 2.0
 
-[sub_resource type="CapsuleShape" id=12]
+[sub_resource type="CapsuleShape" id=14]
 radius = 0.4
 
-[sub_resource type="SphereMesh" id=13]
+[sub_resource type="SphereMesh" id=15]
 radius = 0.2
 height = 0.4
 
@@ -467,10 +467,10 @@ omni_range = 31.0
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.09816, -0.540516, 0.25653 )
 
 [node name="CollisionShape" type="CollisionShape" parent="Level/StaticBody"]
-shape = SubResource( 14 )
+shape = SubResource( 10 )
 
 [node name="MeshInstance" type="MeshInstance" parent="Level/StaticBody/CollisionShape"]
-mesh = SubResource( 15 )
+mesh = SubResource( 11 )
 material/0 = null
 
 [node name="Player" type="Spatial" parent="."]
@@ -489,21 +489,21 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0 )
 
 [node name="Body" type="CollisionShape" parent="Player/Body"]
 transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0 )
-shape = SubResource( 10 )
+shape = SubResource( 12 )
 
 [node name="Mesh" type="MeshInstance" parent="Player/Body"]
 transform = Transform( 1, 0, 0, 0, -1.62921e-07, 1, 0, -1, -1.62921e-07, 0, 0, 0 )
 cast_shadow = 3
-mesh = SubResource( 11 )
+mesh = SubResource( 13 )
 material/0 = null
 
 [node name="HeadBonker" type="Area" parent="Player/Body"]
 
 [node name="Shape" type="CollisionShape" parent="Player/Body/HeadBonker"]
 transform = Transform( 1, 0, 0, 0, -1.62921e-07, 1, 0, -1, -1.62921e-07, 0, 0.6, 0 )
-shape = SubResource( 12 )
+shape = SubResource( 14 )
 
 [node name="tester" type="MeshInstance" parent="Player/Body"]
 visible = false
-mesh = SubResource( 13 )
+mesh = SubResource( 15 )
 material/0 = null

@@ -149,20 +149,31 @@ public class Player : KinematicBody
         }
     }
 
+    // BUG: Sometimes while sprinting, it does not recognize a stair/step and makes a full stop
     private void StairControl()
     {
-        if (GetSlideCount() > 0 && Grounded)
+        if (GetSlideCount() > 0)
         {
             for (int i = 1; i < GetSlideCount(); i++)
             {
                 var collisionPos = GetSlideCollision(i).Position - GlobalTransform.origin;
                 var bottom = -(HeightBodyStanding+0.5f)*0.5f;
                 var stepsize = -1f+StepSize;
+
+                var yOffset = GetSlideCollision(i).Position.y - (GlobalTransform.origin.y - (HeightBodyStanding/2)) * -1;
                 
                 if (collisionPos.y > bottom && collisionPos.y < stepsize)
                 {
-                    GroundSnap = 1f;
-                    GroundVector.y = GetFloorNormal().y * 6f; // this 6f seems to help, but I don't think it's universal
+                    // approximate direction of movement compared to collision point
+                    // where a value of -0 means the movement is parallel to col normal
+                    // and a value of -3 means the movement is perpendicular
+                    if (Velocity.Dot(GetSlideCollision(i).Normal) < -1.0f)
+                    {
+                        GroundSnap = 1f;
+                        // TODO: consider applying a full reposition of body in relation to an offset
+                        //       but for now, adds a constant "jumpforce" of 6f.
+                        GroundVector.y = GetFloorNormal().y * 6f;
+                    }
                 }
             }
         }
