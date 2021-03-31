@@ -49,8 +49,6 @@ public class Player : KinematicBody
     // Singletons
     PlayerInput PlayerInput;
 
-    Mouse Mouse; // temp
-
     public override void _Ready()
     {
         PlayerInput = GetNode<PlayerInput>("/root/PlayerInput");
@@ -66,9 +64,6 @@ public class Player : KinematicBody
         HeightHeadStanding = Head.Translation.y;
 
         CrouchSetState(false);
-
-        Mouse = GetNode<Mouse>("/root/Mouse"); // temp
-        Mouse.Hide(); // temp
     }
 
     public override void _PhysicsProcess(float delta)

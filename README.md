@@ -7,13 +7,12 @@
 ___
 
     todo list
-        ..more to come
 
     ground actions
         [x] walking
         [x] slopes
         [/] stairs
-            - sometimes fail if sprinting
+            - sometimes fails if sprinting
             - does not work for all stepsize or playersize
         [x] crouching
         [x] sprinting
