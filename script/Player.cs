@@ -12,7 +12,8 @@ public class Player : KinematicBody
     [Export] private float CrouchSpeedMultiplier = 0.55f;
     [Export] private bool CrouchModeIsToggle = false;
     [Export] private float JumpStrength = 12f;
-    [Export] private float StepSize = 0.2f;
+    private float StepSize = 0.2f;  // the player currently "jumps" by a factor of 6f when colliding with stairs,
+                                    // so if stepsize increases it can not reach and if decreased then "jump" is too strong
     private float FallSpeedForceStand = 17f; // if fall speed exceeds this velocity, player is forced to stand (if crouched)
     private Vector3 GroundVector;
     private Vector3 Velocity;
@@ -68,9 +69,9 @@ public class Player : KinematicBody
 
     public override void _PhysicsProcess(float delta)
     {
-        GroundControl(delta);
+        GroundProcess(delta);
 
-        SprintProcess();
+        SprintProcess(delta);
 
         CrouchProcess(delta);
 
@@ -80,7 +81,7 @@ public class Player : KinematicBody
 
         GetMovementDirection();
 
-        SetMovementVelocity(delta);
+        MovementVelocityProcess(delta);
 
         JumpProcess();
 
@@ -102,7 +103,7 @@ public class Player : KinematicBody
         }
     }
 
-    private void SetMovementVelocity(float delta)
+    private void MovementVelocityProcess(float delta)
     {
         if (Grounded)
         {
@@ -123,7 +124,7 @@ public class Player : KinematicBody
         }
     }
 
-    private void GroundControl(float delta)
+    private void GroundProcess(float delta)
     {
         if (IsOnFloor())
         {
@@ -194,7 +195,7 @@ public class Player : KinematicBody
 
 
     // TODO: change camera fov
-    private void SprintProcess()
+    private void SprintProcess(float delta)
     {
         SprintRequest = PlayerInput.GetSprint();
     }
@@ -261,6 +262,7 @@ public class Player : KinematicBody
 
         if (body.Height < HeightBodyStanding && HeadBonker.GetOverlappingBodies().Count > 1)
         {
+            CrouchCooldown = 0f; // reset cooldown to enable forced crouched state
             CrouchSetState(true);
         }
     }
@@ -312,22 +314,22 @@ public class Player : KinematicBody
             CrouchCooldown -= 1 * delta;
         }
         CrouchGetInput();
-        CrouchSitStand(delta);
+        CrouchProcessChange(delta);
     }
 
-    private void CrouchSitStand(float delta)
+    private void CrouchProcessChange(float delta)
     {
         WatchTheHead();
 
         if (CrouchRequest)
         {
-            CrouchTryCrouch(delta);
+            CrouchProcessCrouch(delta);
             return;
         }
-        CrouchTryStand(delta);
+        CrouchProcessStand(delta);
     }
 
-    private void CrouchTryCrouch(float delta)
+    private void CrouchProcessCrouch(float delta)
     {
         var body = Body.Shape as CapsuleShape;
 
@@ -346,7 +348,7 @@ public class Player : KinematicBody
         Head.Transform = ht;
     }
 
-    private void CrouchTryStand(float delta)
+    private void CrouchProcessStand(float delta)
     {
         var body = Body.Shape as CapsuleShape;
 
