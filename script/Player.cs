@@ -7,7 +7,8 @@ public class Player : KinematicBody
     // Properties
     [Export] private float Gravity = 42f;
     [Export] private float MaxSlopeThresholdAllowed = 0.7f;
-    [Export] private float MoveSpeed = 3f;
+    [Export] private float MoveSpeedMaxGround = 3f;
+    [Export] private float MoveSpeedMaxAir = 7f;
     [Export] private float RunSpeedMultiplier = 2.5f;
     [Export] private float CrouchSpeedMultiplier = 0.55f;
     [Export] private bool CrouchModeIsToggle = false;
@@ -23,7 +24,7 @@ public class Player : KinematicBody
 
     private float GroundStrength = 10f; // TODO: changed by ground material
     private float GroundCheckDistance = 5f;
-    private float AirStrength = 12f;
+    private float AirStrength = 8f;
 
     private float GroundSnap;
     private float SlideSpeed;
@@ -94,8 +95,8 @@ public class Player : KinematicBody
     {
         var movement = PlayerInput.GetMovement();
         var transform = GlobalTransform;
-        MoveDirection = (!SlideRequest && Grounded) ? Vector3.Zero : MoveDirection;
-        if (!SlideRequest && Grounded)
+        MoveDirection = (!SlideRequest) ? Vector3.Zero : MoveDirection;
+        if (!SlideRequest)
         {
             MoveDirection += -transform.basis.z * movement.y;
             MoveDirection +=  transform.basis.x * movement.x;
@@ -108,9 +109,9 @@ public class Player : KinematicBody
         if (Grounded)
         {
             // get speed
-            var speed = MoveSpeed;
-                speed = (SprintRequest ? MoveSpeed * RunSpeedMultiplier : speed);
-                speed = (CrouchRequest ? MoveSpeed * CrouchSpeedMultiplier : speed);
+            var speed = MoveSpeedMaxGround;
+                speed = (SprintRequest ? MoveSpeedMaxGround * RunSpeedMultiplier : speed);
+                speed = (CrouchRequest ? MoveSpeedMaxGround * CrouchSpeedMultiplier : speed);
                 speed = (SlideRequest  ? SlideSpeed : speed);
 
             // apply speed
@@ -120,8 +121,16 @@ public class Player : KinematicBody
         }
         else
         {
-            Velocity += MoveDirection * AirStrength * delta; // TODO: clamp value to prevent infinte speed
+            Velocity += MoveDirection * AirStrength * delta;
+            Velocity = Vector3Clamp(Velocity, MoveSpeedMaxAir);
         }
+    }
+
+    private Vector3 Vector3Clamp(Vector3 v, float f)
+    {
+        if (v.Length() > f)
+            v = v.Normalized() * f;
+        return v;
     }
 
     private void GroundProcess(float delta)
@@ -166,13 +175,13 @@ public class Player : KinematicBody
                 if (collisionPos.y > bottom && collisionPos.y < stepsize)
                 {
                     // approximate direction of movement compared to collision point
-                    // where a value of -0 means the movement is parallel to col normal
-                    // and a value of -3 means the movement is perpendicular
-                    if (Velocity.Dot(GetSlideCollision(i).Normal) < -1.0f)
+                    // where result of 0 is completely parallel to collision normal,
+                    // and -3 to 0 is range "towards" collision, where -3 is completely perpendicular
+                    // and 0 to +3 is range "away" from collision
+                    if (Velocity.Dot(GetSlideCollision(i).Normal) < -0.8f)
                     {
                         GroundSnap = 1f;
-                        // NOTE: consider applying a full reposition of body in relation to an offset
-                        //       but for now, adds a constant "jumpforce" of 6f.
+                        // TODO: apply force based on distance from collision point to player body bottom to support any value of StepSize
                         GroundVector.y = GetFloorNormal().y * 6f;
                     }
                 }
@@ -245,7 +254,7 @@ public class Player : KinematicBody
 
     private void SlideStart()
     {
-        SlideSpeed = MoveSpeed * RunSpeedMultiplier * 2;
+        SlideSpeed = MoveSpeedMaxGround * RunSpeedMultiplier * 2;
         SlideRequest = true;
         SlideCooldown = 2f;
         SlideBlocked = true;
