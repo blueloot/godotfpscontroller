@@ -80,9 +80,7 @@ public class Player : KinematicBody
 
         StairControl();
 
-        GetMovementDirection();
-
-        MovementVelocityProcess(delta);
+        MovementProcess(delta);
 
         JumpProcess();
 
@@ -91,30 +89,17 @@ public class Player : KinematicBody
         MoveVelocity = MoveAndSlide(MoveVelocity, Vector3.Up, false, 4, MaxSlopeThresholdAllowed, false);
     }
 
-    private void GetMovementDirection()
+    private void MovementProcess(float delta)
     {
-        var movement = PlayerInput.GetMovement();
-        var transform = GlobalTransform;
-        MoveDirection = (!SlideRequest) ? Vector3.Zero : MoveDirection;
-        if (!SlideRequest)
-        {
-            MoveDirection += -transform.basis.z * movement.y;
-            MoveDirection +=  transform.basis.x * movement.x;
-            MoveDirection = MoveDirection.Normalized();
-        }
-    }
+        MovementGetDirection();
 
-    private void MovementVelocityProcess(float delta)
-    {
         if (Grounded)
         {
-            // get speed
             var speed = MoveSpeedMaxGround;
                 speed = (SprintRequest ? MoveSpeedMaxGround * RunSpeedMultiplier : speed);
                 speed = (CrouchRequest ? MoveSpeedMaxGround * CrouchSpeedMultiplier : speed);
                 speed = (SlideRequest  ? SlideSpeed : speed);
 
-            // apply speed
             var JumpRequest = !Grounded;
             var targetVel = MoveDirection * speed * (JumpRequest?1.5f:1);
             Velocity = Velocity.LinearInterpolate( targetVel, GroundStrength * delta);
@@ -123,6 +108,18 @@ public class Player : KinematicBody
         {
             Velocity += MoveDirection * AirStrength * delta;
             Velocity = Vector3Clamp(Velocity, MoveSpeedMaxAir);
+        }
+    }
+
+    private void MovementGetDirection()
+    {
+        var movement = PlayerInput.GetMovement();
+        MoveDirection = (!SlideRequest) ? Vector3.Zero : MoveDirection;
+        if (!SlideRequest)
+        {
+            MoveDirection += -GlobalTransform.basis.z * movement.y;
+            MoveDirection +=  GlobalTransform.basis.x * movement.x;
+            MoveDirection = MoveDirection.Normalized();
         }
     }
 
@@ -199,6 +196,15 @@ public class Player : KinematicBody
             Grounded = false;
             GroundSnap = 1f;
             GroundVector = Vector3.Up * JumpStrength;
+        }
+
+        if (!Grounded)
+        {
+            if  (IsOnCeiling())
+            {
+                // reset y velocity to prevent stickiness to ceiling
+                GroundVector.y = 0f;
+            }
         }
     }
 
