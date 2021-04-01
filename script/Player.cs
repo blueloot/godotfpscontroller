@@ -43,7 +43,8 @@ public class Player : KinematicBody
     // Sliding
     private float SlideSpeed;
     private bool SlideRequest;
-    private float SlideAllowedAtMinimumSprintTime = 0.5f;       // how many seconds player has sprinted in order to be allowed to start a slide
+    private float SlideAllowedAtMinimumSprintTime = 0.3f;       // how many seconds player must sprint in order to be allowed to start a slide
+    private float SlideMaxAllowedSpeed = 15f;                   // how fast player is allowed to slide (prevent infinite speed)
 
     // Sprinting
     private bool SprintRequest;                                 // whether or not the player wants to sprint
@@ -145,6 +146,8 @@ public class Player : KinematicBody
             if (!Grounded)
             {
                 // force remove crouched state
+                // TODO: change this to force remove standing state, maybe also start slide if landing on slope
+                // BUG: since GroundSnap is now dynamically changed, this needs another calculation to compensate
                 if (GroundVector.y < 0-FallSpeedForceStand)  CrouchSetState(false, CrouchCooldownTimer);
 
                 // reduce movement velocity slightly
@@ -155,7 +158,7 @@ public class Player : KinematicBody
             // On floor
             Grounded = true;
             GroundVector = -GetFloorNormal() * GroundSnap;
-            GroundSnap = GroundCheckDistance;
+            GroundSnap = GroundCheckDistance + Velocity.Length();  // adding velocity length to snap to prevent airborne situation on slopes in certain situations
         }
         else
         {
@@ -176,7 +179,7 @@ public class Player : KinematicBody
                 var bottom = -(HeightBodyStanding+0.5f)*0.5f;
                 var stepsize = -1f+StepSize;
                 
-                if (collisionPos.y > bottom && collisionPos.y < stepsize)
+                if (collisionPos.y > bottom-0.1 && collisionPos.y < stepsize)
                 {
                     // approximate direction of movement compared to collision point
                     // where result of 0 is completely parallel to collision normal,
@@ -232,7 +235,7 @@ public class Player : KinematicBody
 
     private void SlideProcess(float delta)
     {
-        if (SprintTime > 1)
+        if (SprintTime > SlideAllowedAtMinimumSprintTime)
         {
             if (CrouchRequest)
             {
@@ -247,13 +250,18 @@ public class Player : KinematicBody
 
         if (SlideRequest)
         {
-            // TODO: Slidespeed should decrease faster up slopes and increase down slopes
-            SlideSpeed -= GroundStrength * delta;
+            var _slopeFriction = 2f;
+            if (GetFloorNormal().y < 0.9f)
+            {
+                _slopeFriction = Velocity.Dot(GetFloorNormal()) *-1;
+                _slopeFriction *= 0.5f;
+            }
+
+            SlideSpeed -= (GroundStrength * _slopeFriction) * delta;
+            SlideSpeed = Mathf.Clamp( SlideSpeed, -SlideMaxAllowedSpeed, SlideMaxAllowedSpeed );
 
             if (SlideSpeed <= 0f)
-            {
                 SlideStop();
-            }
         }
     }
 
