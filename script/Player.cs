@@ -3,46 +3,55 @@ using System;
 
 public class Player : KinematicBody
 {
+    [Export] private float Gravity = 42f;                       // forgot what this does.. sorry
+    [Export] private float JumpStrength = 12f;                  // how strong upwards force when jumping
+    [Export] private float MoveSpeedMaxGround = 3f;             // maximum allowed speed on ground
+    [Export] private float MoveSpeedMaxAir = 7f;                // maximum allowed speed in air
+    [Export] private float MoveSpeedRunMultiplier = 2.5f;       // how fast to move while sprinting
+    [Export] private float MoveSpeedCrouchMultiplier = 0.55f;   // how fast to move while crouched
+    [Export] private bool CrouchModeIsToggle = false;           // whether crouch should be toggled or held
+    [Export] private float MaxSlopeThresholdAllowed = 0.7f;     // at which point a slope is considered a wall
+    [Export] private float StepSize = 0.2f;                     // changing this risks breaking stairs atm
 
-    // Properties
-    [Export] private float Gravity = 42f;
-    [Export] private float MaxSlopeThresholdAllowed = 0.7f;
-    [Export] private float MoveSpeedMaxGround = 3f;
-    [Export] private float MoveSpeedMaxAir = 7f;
-    [Export] private float RunSpeedMultiplier = 2.5f;
-    [Export] private float CrouchSpeedMultiplier = 0.55f;
-    [Export] private bool CrouchModeIsToggle = false;
-    [Export] private float JumpStrength = 12f;
-    private float StepSize = 0.2f;  // the player currently "jumps" by a factor of 6f when colliding with stairs,
-                                    // so if stepsize increases it can not reach and if decreased then "jump" is too strong
-    private float FallSpeedForceStand = 17f; // if fall speed exceeds this velocity, player is forced to stand (if crouched)
-    private Vector3 GroundVector;
-    private Vector3 Velocity;
-    private Vector3 MoveDirection;
-    private Vector3 MoveVelocity;
-    private bool Grounded;
+    private Vector3 MoveDirection;                              // the players movement direction as obtained from movement input
+    private Vector3 Velocity;                                   // the players velocity as obtained from movement input
+    private Vector3 MoveVelocity;                               // the players (previous frame) velocity
+    private Vector3 GroundVector;                               // tracks ground normal and players y velocity snapped to ground
 
-    private float GroundStrength = 10f; // TODO: changed by ground material
-    private float GroundCheckDistance = 5f;
-    private float AirStrength = 8f;
+    // Crouch and Stand
+    private bool CrouchRequest, oldCrouchRequest;               // whether or not player is requesting a crouched state
+    private float CrouchTransitionSpeed = 6f;                   // how fast player transition to crouched or to standing
+    private float CrouchCooldown = 0f;                          // the current cooldown time
+    private float CrouchCooldownTimer = 0.5f;                   // default length of cooldown
+    private float HeightBodyCrouching = 1.0f;                   // size of collider when crouched
+    private float HeightHeadCrouching = -0.2f;                  // position of head when crouched
+    private float HeightBodyStanding;                           // size of collider when standing (grabbed automatically from editor)
+    private float HeightHeadStanding;                           // position of head when standing (grabbed automatically from edtior)
 
-    private float GroundSnap;
+    // Ground
+    private bool Grounded;                                      // in order to check for a "landing" we need to know if player was grounded the previous frame
+    private float GroundStrength = 10f;                         // how quickly player build or lose momentum on ground | TODO: should be changed by ground material
+    private float GroundCheckDistance = 5f;                     // how far down to look for ground (snap to ground)
+    private float GroundSnap;                                   // the current CheckDistance. Since it needs to be disabled if jumping
+
+    // Air
+    private float AirStrength = 8f;                             // how quickly player build or lose moment in air
+
+    // Falling and Landing
+    private float FallSpeedForceStand = 17f;                    // if fall speed exceeds this velocity, player is forced to stand (if crouched)
+
+    // Sliding
     private float SlideSpeed;
     private float SlideCooldown;
     private bool SlideBlocked;
     private bool SlideRequest;
-    private bool SprintRequest;
-    private bool CrouchRequest;
-    private bool oldCrouchRequest;
+    private float SlideAllowedAtMinimumSprintTime = 0.5f;       // how many seconds player has sprinted in order to be allowed to start a slide
 
-    private float CrouchTransitionSpeed = 6f;
-    private float CrouchCooldown = 0f;
-    private float CrouchCooldownTimer = 0.5f; // certain events trigger cooldown of crouch, set length of cooldown time
-    private float HeightBodyCrouching = 1.0f; // size of collider when crouched
-    private float HeightHeadCrouching = -0.2f; // position of head in local space when crouched
-    private float HeightBodyStanding; // grabbed automatically from editor
-    private float HeightHeadStanding; // grabbed automatically from edtior
+    // Sprinting
+    private bool SprintRequest;                                 // whether or not the player wants to sprint
+    private float SprintTime;                                   // timer for how long player has sprinted (while sprintrequest and movement input is not 0)
 
+    // Nodes
     private CollisionShape Body;
     private Spatial Head;
     private MeshInstance Mesh;
@@ -96,8 +105,8 @@ public class Player : KinematicBody
         if (Grounded)
         {
             var speed = MoveSpeedMaxGround;
-                speed = (SprintRequest ? MoveSpeedMaxGround * RunSpeedMultiplier : speed);
-                speed = (CrouchRequest ? MoveSpeedMaxGround * CrouchSpeedMultiplier : speed);
+                speed = (SprintRequest ? MoveSpeedMaxGround * MoveSpeedRunMultiplier : speed);
+                speed = (CrouchRequest ? MoveSpeedMaxGround * MoveSpeedCrouchMultiplier : speed);
                 speed = (SlideRequest  ? SlideSpeed : speed);
 
             var JumpRequest = !Grounded;
@@ -188,7 +197,6 @@ public class Player : KinematicBody
 
     // TODO: Add a cooldown time to prevent continuous jumping (e.g. jumping up a ledge)
     // TODO: Consider reducing jump strength by some value of previous landing impact
-    // TODO: If head collide with ceiling set yvel to 0 to prevent stickiness
     private void JumpProcess()
     {
         if (PlayerInput.GetJump() && Grounded)
@@ -213,6 +221,15 @@ public class Player : KinematicBody
     private void SprintProcess(float delta)
     {
         SprintRequest = PlayerInput.GetSprint();
+
+        if (SprintRequest && MoveDirection != Vector3.Zero)
+        {
+            SprintTime += 1 * delta;
+        }
+        else
+        {
+            SprintTime = 0;
+        }
     }
 
     // BUG: if sprint+crouch is held and slide is requested but is on cooldown. it will activate anyway as soon as cd is over. it shouldn't
@@ -260,7 +277,7 @@ public class Player : KinematicBody
 
     private void SlideStart()
     {
-        SlideSpeed = MoveSpeedMaxGround * RunSpeedMultiplier * 2;
+        SlideSpeed = MoveSpeedMaxGround * MoveSpeedRunMultiplier * 2;
         SlideRequest = true;
         SlideCooldown = 2f;
         SlideBlocked = true;
