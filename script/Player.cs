@@ -42,8 +42,6 @@ public class Player : KinematicBody
 
     // Sliding
     private float SlideSpeed;
-    private float SlideCooldown;
-    private bool SlideBlocked;
     private bool SlideRequest;
     private float SlideAllowedAtMinimumSprintTime = 0.5f;       // how many seconds player has sprinted in order to be allowed to start a slide
 
@@ -220,7 +218,7 @@ public class Player : KinematicBody
     // TODO: change camera fov
     private void SprintProcess(float delta)
     {
-        SprintRequest = PlayerInput.GetSprint();
+        SprintRequest = PlayerInput.GetSprint() && !SlideRequest && !CrouchRequest;
 
         if (SprintRequest && MoveDirection != Vector3.Zero)
         {
@@ -232,41 +230,30 @@ public class Player : KinematicBody
         }
     }
 
-    // BUG: if sprint+crouch is held and slide is requested but is on cooldown. it will activate anyway as soon as cd is over. it shouldn't
-    // BUG: if player stand still and sprint+crouch is held, it will not move
-    // TODO: consider only allowed to slide if player has sprinted for a certain amount of time
-    // TODO: sliding up slopes should decrease slide speed more and sliding down slopes should increase slide speed slightly (depending on ground material)
     private void SlideProcess(float delta)
     {
-        if (CrouchRequest && SprintRequest)
+        if (SprintTime > 1)
         {
-            if (SlideAllowed())
+            if (CrouchRequest)
             {
                 SlideStart();
-                return;
             }
         }
 
         if (!CrouchRequest)
         {
             SlideStop();
-            SlideBlocked = false;
         }
-
 
         if (SlideRequest)
         {
+            // TODO: Slidespeed should decrease faster up slopes and increase down slopes
             SlideSpeed -= GroundStrength * delta;
 
             if (SlideSpeed <= 0f)
             {
                 SlideStop();
             }
-        }
-
-        if (SlideCooldown > 0)
-        {
-            SlideCooldown -= 2f * delta; // random number 2f for now..
         }
     }
 
@@ -279,13 +266,6 @@ public class Player : KinematicBody
     {
         SlideSpeed = MoveSpeedMaxGround * MoveSpeedRunMultiplier * 2;
         SlideRequest = true;
-        SlideCooldown = 2f;
-        SlideBlocked = true;
-    }
-
-    private bool SlideAllowed()
-    {
-        return (SlideCooldown <= 0f && !SlideBlocked);
     }
 
     private void WatchTheHead()
@@ -294,7 +274,7 @@ public class Player : KinematicBody
 
         if (body.Height < HeightBodyStanding && HeadBonker.GetOverlappingBodies().Count > 1)
         {
-            CrouchCooldown = 0f; // reset cooldown to enable forced crouched state
+            CrouchCooldown = 0f; // reset cooldown on crouch to make a forced crouched state
             CrouchSetState(true);
         }
     }
@@ -401,12 +381,10 @@ public class Player : KinematicBody
 
     private void CrouchUpdateMesh(CapsuleShape body)
     {
-        var meshSizeOffset = 0.5f;      // mesh is 0.5f shorter than collider
-        var meshPositionOffset = -0.2f; // mesh is positioned -0.2f below collider
         var mesh = Mesh.Mesh as CapsuleMesh;
+        mesh.MidHeight = body.Height;
         var mt = Mesh.Transform;
-        mesh.MidHeight = body.Height - meshSizeOffset;
-        mt.origin.y = meshPositionOffset - (1-((body.Height-meshSizeOffset) / (HeightBodyStanding-meshSizeOffset)));
+        mt.origin.y = 0 - (1-(body.Height / HeightBodyStanding));
         Mesh.Transform = mt;
     }
 
